@@ -41,7 +41,7 @@ function materialize(file) {
     w.sets.forEach((s, i) => {
       db.workout_sets.push({
         id: uid(), user_id: userId, workout_id: w.id, exercise_id: s.e, position: s.p, set_number: s.n,
-        reps: s.r, weight_kg: s.w, to_failure: !!s.f, done: true,
+        reps: s.r, weight_kg: s.w, to_failure: !!s.f, technique: s.k || (s.f ? 'failure' : 'normal'), blocks: s.b || null, technique_detail: null, done: true,
         created_at: new Date(start.getTime() + (i + 1) * 150000).toISOString()
       });
     });

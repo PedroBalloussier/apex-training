@@ -4,6 +4,7 @@ import { esc } from '../utils/dom.js';
 import { icon } from '../ui/icons.js';
 import { openSheet, toast } from '../ui/feedback.js';
 import { getActivePlan } from '../data/account.js';
+import { dayLabel } from '../data/labels.js';
 import { loadWorkouts, getOpen, startWorkout, discardWorkout } from '../data/workouts.js';
 
 export async function startDay(day) {
@@ -47,7 +48,7 @@ export async function quickStart() {
     content: `<div class="day-list">${plan.data.days.map((d) => `
       <button type="button" class="day-item option" data-day="${d.key}" style="text-align:left">
         <span class="day-badge day-${d.key}">${d.key}</span>
-        <span class="day-text"><span class="day-title">${esc(t('dayTypes.' + d.type))}</span>
+        <span class="day-text"><span class="day-title">${esc(dayLabel(d.type))}</span>
         <span class="day-ex">${esc(t('results.exercises', { n: d.exercises.length }))}</span></span>
         ${icon('chevron')}
       </button>`).join('')}</div>`,

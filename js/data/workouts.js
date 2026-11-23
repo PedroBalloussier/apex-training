@@ -1,4 +1,5 @@
 // Treinos e séries (Supabase).
+import { countable } from './techniques.js';
 import { supabase } from './supabase.js';
 
 let recent = [];        // treinos concluídos recentes (sem as séries)
@@ -93,10 +94,10 @@ export async function discardWorkout() {
 export async function lastSessions(exerciseIds) {
   const out = new Map();
   if (!exerciseIds.length) return out;
-  let q = supabase.from('workout_sets').select('exercise_id, workout_id, set_number, reps, weight_kg, to_failure, created_at')
+  let q = supabase.from('workout_sets').select('exercise_id, workout_id, set_number, reps, weight_kg, to_failure, technique, blocks, technique_detail, created_at')
     .eq('done', true).in('exercise_id', exerciseIds).order('created_at', { ascending: false }).limit(600);
   const { data } = await q;
-  for (const s of data || []) {
+  for (const s of countable(data)) {
     if (open && s.workout_id === open.id) continue;
     const cur = out.get(s.exercise_id);
     if (!cur) out.set(s.exercise_id, { workoutId: s.workout_id, date: s.created_at, sets: [s] });
@@ -110,9 +111,9 @@ export async function lastSessions(exerciseIds) {
 export async function bestWeights(exerciseIds) {
   const out = new Map();
   if (!exerciseIds.length) return out;
-  const { data } = await supabase.from('workout_sets').select('exercise_id, workout_id, weight_kg')
+  const { data } = await supabase.from('workout_sets').select('exercise_id, workout_id, weight_kg, technique')
     .eq('done', true).in('exercise_id', exerciseIds).order('weight_kg', { ascending: false }).limit(1000);
-  for (const s of data || []) {
+  for (const s of countable(data)) {
     if (open && s.workout_id === open.id) continue;
     const w = Number(s.weight_kg || 0);
     if (!out.has(s.exercise_id) || w > out.get(s.exercise_id)) out.set(s.exercise_id, w);
@@ -151,7 +152,7 @@ export function streak(schedule) {
 
 /** Histórico de um exercício: sessões (mais recentes primeiro) com as séries feitas. */
 export async function exerciseHistory(exerciseId) {
-  const { data } = await supabase.from('workout_sets').select('workout_id, set_number, reps, weight_kg, to_failure, created_at')
+  const { data } = await supabase.from('workout_sets').select('workout_id, set_number, reps, weight_kg, to_failure, technique, blocks, technique_detail, created_at')
     .eq('done', true).eq('exercise_id', exerciseId).order('created_at', { ascending: false }).limit(400);
   const map = new Map();
   for (const s of data || []) {

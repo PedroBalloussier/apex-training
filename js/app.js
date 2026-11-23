@@ -22,6 +22,7 @@ import { demoBar, bindDemoBar } from './ui/demo-ui.js';
 import { demoActive } from './data/demo.js';
 import { resetWorkouts } from './data/workouts.js';
 import partyScreen, { inviteScreen } from './screens/party.js';
+import planEditScreen from './screens/plan-edit.js';
 import { resetParty } from './data/party.js';
 import { coachAuto } from './ui/coach.js';
 
@@ -29,6 +30,7 @@ import { coachAuto } from './ui/coach.js';
 const ROUTES = [
   { id: 'today', hash: 'hoje', ic: 'home', screen: today, tab: true },
   { id: 'plan', hash: 'plano', ic: 'plan', screen: planScreen, tab: true },
+  { id: 'plan', hash: 'editar-', prefix: true, ic: 'plan', screen: planEditScreen, hidden: true },
   { id: 'calendar', hash: 'calendario', ic: 'calendar', screen: calendarScreen, tab: true },
   { id: 'dashboard', hash: 'progresso', ic: 'chart', screen: dashboardScreen, tab: true },
   { id: 'body', hash: 'corpo', ic: 'scale', screen: bodyScreen, group: 'progress' },
@@ -49,15 +51,17 @@ const ROUTES = [
 const app = document.getElementById('app');
 let currentId = 'today';
 let currentParam = null;
+let currentRoute = null;
 let account = null;          // módulo de conta (carregado sob demanda)
 let mode = 'loading';        // loading | error | auth | app
 
 function routeFromHash() {
   const h = decodeURIComponent((location.hash || '').replace('#', ''));
   const pre = ROUTES.find((r) => r.prefix && h.startsWith(r.hash) && h.length > r.hash.length);
-  if (pre) { currentParam = h.slice(pre.hash.length); return pre; }
+  if (pre) { currentParam = h.slice(pre.hash.length); currentRoute = pre; return pre; }
   currentParam = null;
-  return ROUTES.find((r) => r.hash === h) || ROUTES[0];
+  currentRoute = ROUTES.find((r) => r.hash === h) || ROUTES[0];
+  return currentRoute;
 }
 
 function navLink(r, cls = 'nav-item') {
@@ -132,7 +136,7 @@ function openMore() {
 
 async function renderScreen() {
   const main = document.getElementById('main');
-  const route = ROUTES.find((r) => r.id === currentId);
+  const route = currentRoute && currentRoute.id === currentId ? currentRoute : ROUTES.find((r) => r.id === currentId);
   document.title = `${t('nav.' + currentId)} · ${t('app.name')}`;
   try {
     await route.screen.render(main, currentParam);

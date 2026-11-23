@@ -1,6 +1,8 @@
 # Gera data/exercises.json. Colunas:
 # id | pt | en | muscle | region | pattern | type(c/i) | equipment | level(1-3) | contra(csv) | unilateral(0/1)
-import json, sys
+import json, sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+from muscle_map import muscles_for
 R = """
 bb_bench_press|Supino reto com barra|Barbell bench press|chest|middle|horizontal_push|c|barbell|2|shoulder|0
 db_bench_press|Supino reto com halteres|Dumbbell bench press|chest|middle|horizontal_push|c|dumbbell|1|shoulder|0
@@ -178,6 +180,7 @@ for line in R.strip().splitlines():
     out.append({"id":i,"name":{"pt":pt,"en":en},"muscle":mu,"region":rg,"pattern":pa,
       "type":"compound" if ty=='c' else "isolation","equipment":eq,"level":int(lv),
       "contra":[c for c in co.split(',') if c],"unilateral":un=='1'})
+    out[-1]["primary"], out[-1]["secondary"] = muscles_for(out[-1])
 json.dump({"version":1,"exercises":out},open(sys.argv[1],'w'),ensure_ascii=False,separators=(',',':'))
 # relatório de grupos de equivalência
 from collections import Counter

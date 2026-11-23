@@ -1,6 +1,6 @@
 // Service worker: guarda os arquivos do app para abrir offline.
 // Ao publicar uma versão nova, altere VERSION para renovar o cache.
-const VERSION = 'apex-v0.8.0';
+const VERSION = 'apex-v0.9.0';
 const ASSETS = [
   './',
   './index.html',
@@ -79,6 +79,10 @@ const ASSETS = [
   './js/i18n/en9.js',
   './js/data/coach-state.js',
   './js/ui/coach.js',
+  './js/i18n/pt10.js',
+  './js/i18n/en10.js',
+  './js/data/techniques.js',
+  './js/screens/plan-edit.js',
   './data/exercises.json',
   './icons/favicon-32.png',
   './icons/coach.jpg',

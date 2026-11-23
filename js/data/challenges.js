@@ -473,14 +473,14 @@ export const CHALLENGES = [
     },
     note: { pt: 'Faça 1 ou 2 séries de aquecimento antes do primeiro exercício. Cada série registrada aqui é a série válida, até a falha.', en: 'Do 1-2 warm-up sets before the first exercise. Each set logged here is the working set, to failure.' },
     exercises: [
-      ex('machine_pulldown', 1, '8-10', 120),
-      ex('bb_row', 1, '8-10', 120),
-      ex('db_row', 1, '8-10', 90),
-      ex('seated_cable_row', 1, '8-10', 90),
-      ex('reverse_pec_deck', 1, '8-10', 60),
-      ex('rear_delt_fly_db', 1, '8-10', 60),
-      ex('back_extension', 1, '8', 60),
-      ex('bb_deadlift', 1, '8', 0)
+      ex('machine_pulldown', 1, '8-10', 120, { technique: { type: 'failure', on: 'all' } }),
+      ex('bb_row', 1, '8-10', 120, { technique: { type: 'failure', on: 'all' } }),
+      ex('db_row', 1, '8-10', 90, { technique: { type: 'failure', on: 'all' } }),
+      ex('seated_cable_row', 1, '8-10', 90, { technique: { type: 'failure', on: 'all' } }),
+      ex('reverse_pec_deck', 1, '8-10', 60, { technique: { type: 'failure', on: 'all' } }),
+      ex('rear_delt_fly_db', 1, '8-10', 60, { technique: { type: 'failure', on: 'all' } }),
+      ex('back_extension', 1, '8', 60, { technique: { type: 'failure', on: 'all' } }),
+      ex('bb_deadlift', 1, '8', 0, { technique: { type: 'failure', on: 'all' } })
     ],
     source: 'https://barbend.com/news/dorian-yates-back-workout/'
   },

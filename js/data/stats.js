@@ -1,6 +1,7 @@
 // Cálculos de progresso, ciclo e relatório (sem DOM).
 import { supabase } from './supabase.js';
 import { workoutsBetween } from './workouts.js';
+import { countable, setVolume } from './techniques.js';
 
 const DAY = 864e5;
 export const dayKey = (d) => { const x = new Date(d); return `${x.getFullYear()}-${x.getMonth()}-${x.getDate()}`; };
@@ -10,10 +11,11 @@ export const e1rm = (w, r) => (r > 0 && w > 0 ? w * (1 + Math.min(r, 12) / 30) :
 /** Séries feitas desde uma data, com a data do treino. */
 export async function setsSince(since, until = new Date(Date.now() + DAY)) {
   const { data } = await supabase.from('workout_sets')
-    .select('exercise_id, reps, weight_kg, workout_id, created_at, to_failure')
+    .select('exercise_id, reps, weight_kg, workout_id, created_at, to_failure, technique, blocks')
     .eq('done', true).gte('created_at', since.toISOString()).lt('created_at', until.toISOString())
     .order('created_at', { ascending: true }).limit(8000);
-  return data || [];
+  // Aquecimento não conta para volume, recordes, progressão nem séries por músculo
+  return countable(data);
 }
 
 export async function workoutsSince(since, until = new Date(Date.now() + DAY)) {
@@ -112,11 +114,11 @@ export function buildReport(row, workouts, sets, body) {
   const done = workouts.length;
   const adherence = scheduled ? Math.min(100, Math.round((done / scheduled) * 100)) : null;
 
-  const volume = sets.reduce((s, x) => s + Number(x.weight_kg || 0) * Number(x.reps || 0), 0);
+  const volume = sets.reduce((s, x) => s + setVolume(x), 0);
   const weeksSpan = Math.max(1, Math.ceil((to - from) / (7 * DAY)));
   const twoWeeks = 14 * DAY;
-  const firstVol = sets.filter((x) => new Date(x.created_at) - from < twoWeeks).reduce((s, x) => s + Number(x.weight_kg || 0) * Number(x.reps || 0), 0);
-  const lastVol = sets.filter((x) => to - new Date(x.created_at) < twoWeeks).reduce((s, x) => s + Number(x.weight_kg || 0) * Number(x.reps || 0), 0);
+  const firstVol = sets.filter((x) => new Date(x.created_at) - from < twoWeeks).reduce((s, x) => s + setVolume(x), 0);
+  const lastVol = sets.filter((x) => to - new Date(x.created_at) < twoWeeks).reduce((s, x) => s + setVolume(x), 0);
   const volumeTrend = weeksSpan >= 4 && firstVol > 0 ? Math.round(((lastVol - firstVol) / firstVol) * 100) : null;
 
   const perEx = perExerciseSessions(sets);

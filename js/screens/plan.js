@@ -6,7 +6,10 @@ import { openSwap } from '../ui/swap.js';
 import { dayLabel, repsText } from '../data/labels.js';
 import { toast } from '../ui/feedback.js';
 import { startDay } from './start.js';
-import { loadCatalog, getExercise, exerciseName } from '../data/catalog.js';
+import { loadCatalog, getExercise, exerciseName, musclesLine } from '../data/catalog.js';
+import { plannedText, groupSize, groupName } from '../data/techniques.js';
+import { weekWarnings } from '../engine/generator.js';
+import { warningText } from './plan-edit.js';
 import { formatDuration } from '../utils/units.js';
 import { openSheet } from '../ui/feedback.js';
 import triage from './triage.js';
@@ -40,14 +43,16 @@ export function exerciseList(day, lang, { actions = false } = {}) {
   const ex = day.exercises;
   return `<ol class="ex-list">${ex.map((x, i) => {
     const e = getExercise(x.id);
-    const meta = e ? `${t('muscles.' + e.muscle)} · ${t('equip.' + e.equipment)}${e.unilateral ? ' · ' + t('session.perSide') : ''}` : '';
+    const areas = musclesLine(x.id);
+    const meta = e ? `${areas || t('muscles.' + e.muscle)} · ${t('equip.' + e.equipment)}${e.unilateral ? ' · ' + t('session.perSide') : ''}` : '';
+    const planned = plannedText(x);
     const inGroup = !!x.group;
     const first = inGroup && (i === 0 || ex[i - 1].group !== x.group);
     const last = inGroup && (i === ex.length - 1 || ex[i + 1].group !== x.group);
     return `<li class="ex-row ${inGroup ? 'grouped' : ''} ${first ? 'g-first' : ''} ${last ? 'g-last' : ''}">
-      ${first ? `<span class="group-tag">${esc(t('session.biset'))}</span>` : ''}
+      ${first ? `<span class="group-tag">${esc(groupName(groupSize(ex, i)))}</span>` : ''}
       <span class="ex-num num">${i + 1}</span>
-      <div class="ex-main"><a class="ex-name ex-link" href="#ex-${esc(x.id)}">${esc(exerciseName(x.id, lang))}</a><span class="ex-meta">${esc(meta)}</span></div>
+      <div class="ex-main"><a class="ex-name ex-link" href="#ex-${esc(x.id)}">${esc(exerciseName(x.id, lang))}</a><span class="ex-meta">${esc(meta)}</span>${planned ? `<span class="ex-areas planned">${esc(planned)}</span>` : ''}</div>
       <div class="ex-dose num">${x.sets} × ${esc(repsText(x.reps))}${x.restSec && (!inGroup || last) ? `<small>${esc(t('plan.rest'))} ${esc(formatDuration(x.restSec, lang))}</small>` : ''}</div>
       ${actions ? `<button type="button" class="icon-btn" data-ex-menu="${i}" aria-label="${esc(t('plan.actions'))}">${icon('more')}</button>` : ''}
     </li>`;
@@ -113,18 +118,23 @@ export default {
           ${weekStrip(plan)}
         </div>
 
+        ${(() => { const ws = weekWarnings(plan, getExercise); return ws.length ? `<div class="card warn-card">
+          <div class="card-head"><div class="card-title">${icon('info')}<h2>${esc(t('edit.warnings'))}</h2></div></div>
+          <ul class="feature-list">${ws.map((w) => `<li>${icon('info')}<span>${esc(warningText(w))}</span></li>`).join('')}</ul></div>` : ''; })()}
+
         <div class="day-tabs" role="tablist">
           ${plan.days.map((d) => `<button type="button" class="day-tab" role="tab" data-day="${d.key}" aria-selected="${d.key === selectedKey}">
-            <span class="day-badge day-${d.key}">${d.key}</span>${esc(t('dayTypes.' + d.type))}</button>`).join('')}
+            <span class="day-badge day-${d.key}">${d.key}</span>${esc(dayLabel(d.type))}</button>`).join('')}
         </div>
 
         <div class="card plan-day">
           <div class="card-head">
-            <div class="card-title"><span class="day-badge day-${day.key}">${day.key}</span><h2>${esc(t('dayTypes.' + day.type))}</h2></div>
+            <div class="card-title"><span class="day-badge day-${day.key}">${day.key}</span><h2>${esc(dayLabel(day.type))}</h2></div>
             <span class="chip num">${esc(t('results.exercises', { n: day.exercises.length }))}</span>
           </div>
-          <div class="diff-row">${diffBadge(difficultyOf(day.exercises), { label: true })}</div>
+          <div class="diff-row">${diffBadge(difficultyOf(day.exercises), { label: true })}${day.edited ? `<span class="chip">${esc(t('edit.edited'))}</span>` : ''}</div>
           ${exerciseList(day, lang, { actions: true })}
+          <a class="btn btn-block" href="#editar-${esc(day.key)}" style="margin-top:12px">${icon('plan')}${esc(t('edit.button'))}</a>
           <button type="button" class="btn btn-primary btn-block" data-start style="margin-top:14px">${icon('dumbbell')}${esc(t('plan.startDay', { k: day.key }))}</button>
         </div>
 

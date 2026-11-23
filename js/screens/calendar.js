@@ -10,6 +10,7 @@ import { workoutsBetween, workoutSets } from '../data/workouts.js';
 import { formatWeight, formatDuration, weightToUser } from '../utils/units.js';
 import { exerciseList } from './plan.js';
 import { startDay } from './start.js';
+import { setVolume, setText } from '../data/techniques.js';
 import { dayLabel } from '../data/labels.js';
 
 let viewYear = null, viewMonth = null;
@@ -127,7 +128,7 @@ export default {
         const blocks = [];
         for (const w of ws) {
           const sets = await workoutSets(w.id);
-          const volume = sets.reduce((sum, s) => sum + Number(s.weight_kg || 0) * Number(s.reps || 0), 0);
+          const volume = sets.reduce((sum, s) => sum + setVolume(s), 0);
           const byEx = new Map();
           for (const s of sets) { if (!byEx.has(s.exercise_id)) byEx.set(s.exercise_id, []); byEx.get(s.exercise_id).push(s); }
           blocks.push(`
@@ -139,7 +140,7 @@ export default {
             </div>
             <ul class="hist-list">${[...byEx.entries()].map(([id, ss]) => `
               <li><a class="hist-date" href="#ex-${esc(id)}" data-close-link>${esc(exerciseName(id, lang))}</a>
-              <span class="hist-sets num">${esc(ss.map((x) => `${x.weight_kg != null ? weightToUser(Number(x.weight_kg), unit) : '—'}×${x.reps ?? '—'}`).join('  ·  '))}</span></li>`).join('')}</ul>`);
+              <span class="hist-sets num">${esc(ss.map((x) => setText(x, (kg) => weightToUser(kg, unit))).join('  ·  '))}</span></li>`).join('')}</ul>`);
         }
         openSheet({ title, content: blocks.join('<hr class="sep">') + `<div class="sheet-actions"><button type="button" class="btn btn-ghost" data-dismiss>${esc(t('sheet.close'))}</button></div>`,
           onMount(sheet, close) { sheet.querySelectorAll('[data-close-link]').forEach((a) => a.addEventListener('click', close)); } });
@@ -149,7 +150,7 @@ export default {
         openSheet({
           title,
           content: `
-            <div class="card-title" style="margin-bottom:6px"><span class="day-badge day-${esc(sched.key)}">${esc(sched.key)}</span><h3>${esc(t('dayTypes.' + sched.type))}</h3></div>
+            <div class="card-title" style="margin-bottom:6px"><span class="day-badge day-${esc(sched.key)}">${esc(sched.key)}</span><h3>${esc(dayLabel(sched.type))}</h3></div>
             ${past ? `<p class="muted" style="margin-bottom:8px">${esc(t('calendar.missedText'))}</p>` : ''}
             ${exerciseList(sched, lang)}
             <div class="sheet-actions">

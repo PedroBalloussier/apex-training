@@ -15,6 +15,7 @@ import { startChallenge } from './start.js';
 import { diffBadge } from '../ui/difficulty.js';
 import { quotesFor } from '../data/quotes.js';
 import { coachTip } from '../ui/coach.js';
+import { dayLabel } from '../data/labels.js';
 import { challengeDifficulty } from '../engine/difficulty.js';
 
 let filter = 'all';
@@ -28,7 +29,7 @@ function placementText(pl, lang) {
   const isToday = new Date().toDateString() === pl.date.toDateString();
   const when = isToday ? t('hall.today') : day;
   return pl.mode === 'replace'
-    ? t('hall.replaces', { k: pl.day.key, day: t('dayTypes.' + pl.day.type), when })
+    ? t('hall.replaces', { k: pl.day.key, day: dayLabel(pl.day.type), when })
     : t('hall.extraDay', { when });
 }
 

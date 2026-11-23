@@ -9,6 +9,12 @@ export function dayLabel(type) {
     const lang = getLanguage();
     return c ? `${c.person}: ${c.title[lang] || c.title.pt}` : t('nav.hall');
   }
+  if (type && type.startsWith('custom:')) {
+    const ms = type.slice(7).split('+').filter(Boolean);
+    const name = (m) => (m === 'fullbody' ? t('dayTypes.conditioning') : t('muscles.' + m));
+    if (ms.length <= 1) return ms.map(name).join('');
+    return ms.slice(0, -1).map(name).join(', ') + t('edit.and') + name(ms[ms.length - 1]);
+  }
   return t('dayTypes.' + type);
 }
 

@@ -4,6 +4,7 @@ import { esc } from '../utils/dom.js';
 import { loadCatalog, exerciseName } from '../data/catalog.js';
 import { generatePlans, HOME_EXTRAS } from '../engine/generator.js';
 import { saveTriage, activatePlan, lastTriage } from '../data/account.js';
+import { dayLabel } from '../data/labels.js';
 import { toast } from '../ui/feedback.js';
 
 const DEFAULTS = {
@@ -186,7 +187,7 @@ function renderResults(el) {
                 <div class="day-item">
                   <span class="day-badge day-${d.key}">${d.key}</span>
                   <div class="day-text">
-                    <span class="day-title">${esc(t('dayTypes.' + d.type))}</span>
+                    <span class="day-title">${esc(dayLabel(d.type))}</span>
                     <span class="day-ex">${esc(d.exercises.slice(0, 3).map((x) => exerciseName(x.id, lang)).join(' · '))}${d.exercises.length > 3 ? ' · +' + (d.exercises.length - 3) : ''}</span>
                   </div>
                 </div>`).join('')}

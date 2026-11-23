@@ -44,7 +44,15 @@ function simulateCycle({ planId, plan, startedDaysAgo, endDaysAgo, skipRate, wee
       for (let n = 1; n <= x.sets; n++) {
         let reps = r ? Math.max(r[0] - 1, Math.min(r[1], r[0] + Math.floor(rnd() * (r[1] - r[0] + 2)) - (n > 2 ? 1 : 0))) : null;
         if (r && reps < r[1]) allTop = false;
-        sets.push({ e: x.id, p, n, r: reps, w: ex.equipment === 'bodyweight' || ex.equipment === 'band' ? null : st.w, ...(r && n === x.sets && rnd() < 0.15 ? { f: true } : {}) });
+        const wt = ex.equipment === 'bodyweight' || ex.equipment === 'band' ? null : st.w;
+        const set = { e: x.id, p, n, r: reps, w: wt, ...(r && n === x.sets && rnd() < 0.15 ? { f: true } : {}) };
+        // Técnicas: drop set ou rest-pause na última série de exercícios isolados com carga
+        if (r && wt && n === x.sets && ex.type === 'isolation' && !set.f) {
+          const roll = rnd();
+          if (roll < 0.18) { set.k = 'drop'; set.b = [{ weight_kg: Math.round(wt * 0.75 * 2) / 2, reps: Math.max(4, reps - 2) }, { weight_kg: Math.round(wt * 0.55 * 2) / 2, reps: Math.max(4, reps - 3) }]; }
+          else if (roll < 0.26) { set.k = 'rest_pause'; set.b = [{ weight_kg: wt, reps: 4 }, { weight_kg: wt, reps: 3 }]; }
+        }
+        sets.push(set);
       }
       if (r && (allTop || rnd() < 0.35)) st.top = true;
     });

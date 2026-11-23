@@ -6,6 +6,7 @@ import { loadCatalog, exerciseName } from './catalog.js';
 import { dayLabel } from './labels.js';
 import { weightToUser, lengthToUser } from '../utils/units.js';
 import { BODY_FIELDS } from './body.js';
+import { techOf, techName, blocksOf } from './techniques.js';
 
 function csv(rows, lang) {
   // PT: ponto e vírgula e vírgula decimal (padrão do Excel em português); EN: vírgula e ponto.
@@ -35,10 +36,10 @@ export async function exportWorkoutsCsv() {
   await loadCatalog();
   const [{ data: workouts }, { data: sets }] = await Promise.all([
     supabase.from('workouts').select('id, day_key, day_type, started_at, duration_sec').eq('status', 'done').order('started_at', { ascending: true }).limit(5000),
-    supabase.from('workout_sets').select('workout_id, exercise_id, position, set_number, reps, weight_kg, to_failure, done').eq('done', true).limit(50000)
+    supabase.from('workout_sets').select('workout_id, exercise_id, position, set_number, reps, weight_kg, to_failure, technique, blocks, technique_detail, done').eq('done', true).limit(50000)
   ]);
   const byW = new Map((workouts || []).map((w) => [w.id, w]));
-  const rows = [[t('csv.date'), t('csv.time'), t('csv.workout'), t('csv.exercise'), t('csv.set'), t('csv.reps'), `${t('csv.load')} (${weightUnit})`, t('csv.failure'), t('csv.duration')]];
+  const rows = [[t('csv.date'), t('csv.time'), t('csv.workout'), t('csv.exercise'), t('csv.set'), t('csv.reps'), `${t('csv.load')} (${weightUnit})`, t('csv.failure'), t('tech.label'), t('csv.blocks'), t('csv.duration')]];
   const list = (sets || []).filter((s) => byW.has(s.workout_id))
     .sort((a, b) => (byW.get(a.workout_id).started_at.localeCompare(byW.get(b.workout_id).started_at)) || a.position - b.position || a.set_number - b.set_number);
   for (const s of list) {
@@ -48,7 +49,10 @@ export async function exportWorkoutsCsv() {
       d.toLocaleDateString(lang === 'en' ? 'en-CA' : 'pt-BR'), d.toLocaleTimeString(lang === 'en' ? 'en-GB' : 'pt-BR', { hour: '2-digit', minute: '2-digit' }),
       `${w.day_key} · ${dayLabel(w.day_type)}`, exerciseName(s.exercise_id, lang), s.set_number, s.reps,
       s.weight_kg != null ? round(weightToUser(Number(s.weight_kg), weightUnit)) : null,
-      s.to_failure ? t('csv.yes') : '', w.duration_sec ? Math.round(w.duration_sec / 60) : null
+      s.to_failure ? t('csv.yes') : '',
+      techOf(s) === 'normal' ? '' : techName(techOf(s)) + (s.technique_detail ? ' ' + s.technique_detail : ''),
+      blocksOf(s).map((b) => `${b.weight_kg != null ? round(weightToUser(Number(b.weight_kg), weightUnit)) : ''} x ${b.reps ?? ''}`).join(' | '),
+      w.duration_sec ? Math.round(w.duration_sec / 60) : null
     ]);
   }
   download(csv(rows, lang), `apex-treinos-${stamp()}.csv`);

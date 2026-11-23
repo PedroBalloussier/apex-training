@@ -799,3 +799,82 @@ body.coach-open { overflow: hidden; }
 @media (max-width: 560px) { .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); } }
 .cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 @media (max-width: 380px) { .cal-grid { gap: 3px; } .cal-cell { padding: 3px; } }
+/* Músculos trabalhados */
+.muscle-groups { display: grid; gap: 12px; }
+.muscle-groups .chips { margin-top: 6px; }
+.chip.chip-strong { border-color: color-mix(in srgb, var(--primary) 45%, var(--line)); background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)); color: var(--text); font-weight: 600; }
+.ex-areas { display: block; font-size: 12px; color: var(--text-3); margin-top: 1px; }
+
+/* ---------- Técnicas de série ---------- */
+.tech-btn { height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text-3); font: inherit; font-weight: 800; font-size: 12.5px; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.tech-btn svg { width: 16px; height: 16px; }
+.tech-btn:disabled { opacity: .7; cursor: default; }
+.tech-btn:not(.t-normal), .tech-code:not(.t-normal) { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 50%, transparent); background: color-mix(in srgb, var(--warning) 12%, var(--surface-2)); }
+.tech-btn.t-warmup, .tech-code.t-warmup { color: var(--text-2); border-color: var(--line-2); background: var(--surface-3); }
+.tech-btn.t-drop, .tech-btn.t-rest_pause, .tech-btn.t-myo, .tech-code.t-drop, .tech-code.t-rest_pause, .tech-code.t-myo { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, transparent); background: color-mix(in srgb, var(--accent) 12%, var(--surface-2)); }
+.tech-list { display: grid; gap: 6px; }
+.tech-opt { display: flex; gap: 12px; align-items: flex-start; text-align: left; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: inherit; cursor: pointer; }
+.tech-opt.on { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--surface-2)); }
+.tech-opt > span:last-child { display: grid; gap: 2px; }
+.tech-opt small { color: var(--text-3); font-size: 12.5px; line-height: 1.35; }
+.tech-code { width: 34px; height: 30px; flex: none; border-radius: 9px; border: 1px solid var(--line); display: grid; place-items: center; font-weight: 800; font-size: 12px; color: var(--text-3); }
+.tech-code svg { width: 14px; height: 14px; }
+.tempo-field { margin-top: 6px; display: grid; gap: 6px; }
+.set-blocks { display: grid; gap: 6px; margin: -2px 0 6px 34px; padding-left: 10px; border-left: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+.block-row { display: grid; grid-template-columns: 74px 1fr 1fr 32px; gap: 6px; align-items: center; }
+.block-label { font-size: 11.5px; color: var(--text-3); font-weight: 600; }
+.block-x { width: 32px; height: 32px; }
+.block-x svg { width: 14px; height: 14px; }
+.block-add { justify-self: start; }
+.ex-areas.planned { color: var(--warning); }
+@media (max-width: 420px) { .set-blocks { margin-left: 22px; } .block-row { grid-template-columns: 62px 1fr 1fr 30px; gap: 5px; } }
+
+/* ---------- Editar dia ---------- */
+.preview { margin-top: 14px; padding: 14px; border-radius: 16px; border: 1px dashed var(--line-2); background: var(--surface-2); display: grid; gap: 10px; }
+.pv-group strong { font-size: 13px; }
+.pv-group ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 4px; }
+.pv-group li { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.pv-group li svg { width: 15px; height: 15px; flex: none; }
+.pv-kept li svg { color: var(--text-3); }
+.pv-added li svg { color: var(--success); }
+.pv-removed li { color: var(--text-3); text-decoration: line-through; }
+.pv-removed li svg { color: var(--danger); }
+.edit-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.edit-row { position: relative; border: 1px solid var(--line); border-radius: 16px; padding: 12px; background: color-mix(in srgb, var(--surface-2) 55%, transparent); display: grid; gap: 10px; }
+.edit-row.grouped { border-left: 3px solid var(--accent); }
+.edit-row .group-tag { position: static; justify-self: start; }
+.edit-top { display: flex; gap: 10px; align-items: flex-start; }
+.edit-top .ex-main { flex: 1; min-width: 0; }
+.edit-top .ex-name { font-weight: 650; }
+.edit-actions { display: flex; gap: 2px; flex: none; }
+.edit-actions .icon-btn { width: 32px; height: 32px; }
+.edit-actions .icon-btn svg { width: 16px; height: 16px; }
+.edit-actions [data-up] svg { transform: rotate(-90deg); }
+.edit-actions [data-down] svg { transform: rotate(90deg); }
+.edit-actions [data-link][aria-pressed="true"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.edit-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.edit-fields label { display: grid; gap: 4px; font-size: 11.5px; color: var(--text-3); font-weight: 600; }
+.edit-fields .span2 { grid-column: 1 / -1; }
+.edit-fields .input-sm { height: 38px; padding: 0 10px; }
+.set-stepper { display: flex; align-items: center; justify-content: space-between; height: 38px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); padding: 0 2px; }
+.set-stepper .icon-btn { width: 30px; height: 30px; }
+.set-stepper .icon-btn svg { width: 14px; height: 14px; }
+.set-stepper span { font-weight: 700; color: var(--text); font-size: 15px; }
+.tech-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.warn-card { border-color: color-mix(in srgb, var(--warning) 35%, var(--line)); }
+.warn-card .feature-list svg { color: var(--warning); }
+.edit-footer { display: grid; gap: 8px; }
+.edit-footer-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.picker { display: grid; gap: 10px; }
+.picker-chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.picker-chips .chip-btn { flex: none; white-space: nowrap; }
+.picker-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 50vh; overflow-y: auto; }
+.pick-row { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: inherit; cursor: pointer; }
+.pick-row > span { display: grid; gap: 2px; min-width: 0; }
+.pick-row small { color: var(--text-3); font-size: 12px; }
+.pick-row svg { width: 18px; height: 18px; color: var(--primary); flex: none; }
+.pick-row:disabled { opacity: .5; cursor: default; }
+.diff-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 380px) { .edit-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.edit-list, .edit-row, .edit-fields > label, .tech-pick > *, .set-stepper { min-width: 0; }
+.edit-fields .input-sm, .tech-pick select { width: 100%; }

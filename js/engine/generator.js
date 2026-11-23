@@ -325,3 +325,167 @@ export function nextTraining(plan, from = new Date()) {
 
 export const SPLIT_KEYS = Object.keys(SPLITS);
 export const DAY_TYPE_KEYS = Object.keys(DAY_TYPES);
+
+/* ---------- Edição de um dia (foco escolhido pelo usuário) ---------- */
+export const EDIT_MUSCLES = ['chest', 'back', 'shoulders', 'biceps', 'triceps', 'forearms', 'quads', 'hamstrings', 'glutes', 'calves', 'core', 'fullbody'];
+// Ordem dos slots de cada grupo: composto principal primeiro, depois variações
+const MUSCLE_SLOTS = {
+  chest: ['chestMain', 'chestUpper', 'chestFly', 'chestLower'],
+  back: ['backVert', 'backHoriz', 'backIso', 'backHoriz', 'traps', 'lowBack'],
+  shoulders: ['shPress', 'shLateral', 'shRear', 'shFront'],
+  biceps: ['biLong', 'biStretch', 'biHammer', 'biShort'],
+  triceps: ['triCompound', 'triPush', 'triOver'],
+  forearms: ['forearm', 'forearmExt'],
+  quads: ['squat', 'lunge', 'quadIso'],
+  hamstrings: ['hinge', 'hamCurl'],
+  glutes: ['hipThrust', 'abduction', 'gluteIso'],
+  calves: ['calf', 'calfSeated'],
+  core: ['coreHold', 'coreFlex', 'coreLeg', 'coreRot'],
+  fullbody: ['cardio', 'condition', 'power']
+};
+const BIG = new Set(['chest', 'back', 'quads', 'hamstrings', 'glutes', 'shoulders', 'fullbody']);
+
+/** Grupos que um dia realmente treina, pelas séries de cada exercício (músculo principal). */
+export function computeFocus(exercises, getEx) {
+  const sets = new Map();
+  let total = 0;
+  for (const x of exercises || []) {
+    const e = getEx(x.id);
+    if (!e) continue;
+    const n = Number(x.sets) || 1;
+    sets.set(e.muscle, (sets.get(e.muscle) || 0) + n);
+    total += n;
+  }
+  if (!total) return [];
+  const list = [...sets.entries()].sort((a, b) => b[1] - a[1]);
+  const main = list.filter(([m, n]) => n / total >= 0.2 && m !== 'core').map(([m]) => m);
+  return (main.length ? main : [list[0][0]]).slice(0, 4);
+}
+
+/** Tipo de dia para um conjunto de grupos: um tipo conhecido quando bate exatamente, senão "custom:a+b". */
+export function typeForMuscles(muscles) {
+  const want = [...muscles].sort().join('+');
+  const prefer = ['back_bi', 'chest_tri', 'legs_sh', 'chest_back', 'sh_arms', 'chest', 'back', 'shoulders', 'arms', 'legs', 'push', 'pull', 'conditioning'];
+  for (const k of prefer) {
+    if (DAY_TYPES[k] && [...DAY_TYPES[k].focus].sort().join('+') === want) return k;
+  }
+  return 'custom:' + muscles.join('+');
+}
+
+function editCtx(plan, answers, otherDays) {
+  const a = answers || {};
+  const planUsed = new Map();
+  for (const d of otherDays) for (const x of d.exercises) planUsed.set(x.id, (planUsed.get(x.id) || 0) + 1);
+  return {
+    goal: plan.goal || 'hypertrophy',
+    level: plan.level || 'beginner',
+    equipment: a.location ? equipmentFor(a) : new Set(EQUIPMENT_PRESETS.full_gym),
+    limitations: new Set((a.limitations || []).filter((l) => l !== 'none')),
+    planUsed,
+    dayUsed: new Set()
+  };
+}
+
+/**
+ * Refaz um dia para os grupos escolhidos: mantém os exercícios que ainda servem e completa o resto.
+ * Retorna { exercises, kept, added, removed } (listas de ids).
+ */
+export function fillDay({ muscles, day, plan, answers, catalog }) {
+  const byId = new Map(catalog.map((e) => [e.id, e]));
+  const ctx = editCtx(plan, answers, plan.days.filter((d) => d.key !== day.key));
+  const size = Math.min(9, Math.max(4, day.exercises.filter((x) => (byId.get(x.id) || {}).muscle !== 'fullbody' || muscles.includes('fullbody')).length || 6));
+
+  // 1) Quantos exercícios cabem para cada grupo (o primeiro escolhido e os grupos grandes ganham mais)
+  const share = muscles.map((m, i) => (BIG.has(m) ? 2 : 1) + (i === 0 ? 1 : 0));
+  const sum = share.reduce((x, y) => x + y, 0);
+  const target = share.map((w) => Math.max(1, Math.round((size * w) / sum)));
+  while (target.reduce((x, y) => x + y, 0) > size) { const i = target.indexOf(Math.max(...target)); target[i]--; }
+  while (target.reduce((x, y) => x + y, 0) < size) { target[0]++; }
+
+  // 2) Mantém o que ainda serve, até a cota de cada grupo (compostos primeiro)
+  const keep = [];
+  muscles.forEach((m, i) => {
+    const mine = day.exercises.filter((x) => (byId.get(x.id) || {}).muscle === m)
+      .map((x, pos) => ({ x, pos, c: byId.get(x.id).type === 'compound' }))
+      .sort((p1, p2) => (p2.c - p1.c) || p1.pos - p2.pos)
+      .slice(0, target[i]).sort((p1, p2) => p1.pos - p2.pos).map((o) => o.x);
+    keep.push(...mine);
+  });
+  keep.forEach((x) => ctx.dayUsed.add(x.id));
+
+  // Slots restantes de cada grupo (os mantidos ocupam os slots que combinam)
+  const queues = muscles.map((m) => [...(MUSCLE_SLOTS[m] || [])]);
+  const missing = muscles.map((m, i) => target[i] - keep.filter((x) => byId.get(x.id).muscle === m).length);
+  for (const x of keep) {
+    const e = byId.get(x.id);
+    const q = queues[muscles.indexOf(e.muscle)];
+    const si = q.findIndex((sk) => matches(e, S[sk]));
+    if (si !== -1) q.splice(si, 1);
+  }
+  const slots = [];
+  muscles.forEach((m, i) => {
+    for (let k = 0; k < missing[i]; k++) {
+      const sk = queues[i].length ? queues[i].shift() : (MUSCLE_SLOTS[m] || [])[k % (MUSCLE_SLOTS[m] || ['x']).length];
+      slots.push({ sk, m, order: i });
+    }
+  });
+
+  // 3) Escolhe os exercícios novos
+  const added = [];
+  for (const sl of slots) {
+    ctx.isMainSlot = false;
+    const ex = pickExercise(catalog, sl.sk, ctx, 0) || pickExercise(catalog, '__any_' + sl.m, { ...ctx, anyMuscle: sl.m }, 0);
+    if (!ex) continue;
+    ctx.dayUsed.add(ex.id);
+    added.push({ id: ex.id, order: sl.order, compound: ex.type === 'compound', ...prescription(ctx.goal, ex, false, ctx.level) });
+  }
+
+  // 4) Ordem final: por grupo escolhido, compostos primeiro; mantidos seguem na ordem em que estavam
+  const keptWith = keep.map((x, i) => ({ x, order: muscles.indexOf(byId.get(x.id).muscle), compound: byId.get(x.id).type === 'compound', pos: i }));
+  const addedWith = added.map((a, i) => ({ x: (({ order, compound, ...rest }) => rest)(a), order: a.order, compound: a.compound, pos: 100 + i }));
+  const all = [...keptWith, ...addedWith].sort((a, b) => a.order - b.order || (b.compound - a.compound) || a.pos - b.pos);
+  const exercises = all.map((o) => o.x);
+  const keptIds = keep.map((x) => x.id);
+  return {
+    exercises,
+    kept: keptIds,
+    added: added.map((a) => a.id),
+    removed: day.exercises.filter((x) => !keptIds.includes(x.id)).map((x) => x.id)
+  };
+}
+
+/** Prescrição padrão para um exercício adicionado à mão. */
+export function defaultPrescription(plan, ex) {
+  return prescription(plan.goal || 'hypertrophy', ex, false, plan.level || 'beginner');
+}
+
+/** Avisos da semana (nunca bloqueiam): dia longo, mesmo músculo em dias seguidos, grupo sem trabalho. */
+export function weekWarnings(plan, getEx) {
+  const out = [];
+  const setsOf = (d) => d.exercises.reduce((n, x) => n + (Number(x.sets) || 0), 0);
+  for (const d of plan.days) { const n = setsOf(d); if (n > 30) out.push({ key: 'tooMany', p: { k: d.key, n } }); }
+  // Dias de treino em ordem na semana (segunda a domingo)
+  const order = [1, 2, 3, 4, 5, 6, 0];
+  const seq = order.map((wd) => { const i = plan.schedule.indexOf(wd); return i === -1 ? null : plan.days[i % plan.days.length]; });
+  const muscleSets = (d) => {
+    const m = new Map();
+    for (const x of d.exercises) { const e = getEx(x.id); if (e && !['core', 'fullbody', 'forearms'].includes(e.muscle)) m.set(e.muscle, (m.get(e.muscle) || 0) + (Number(x.sets) || 0)); }
+    return m;
+  };
+  const seen = new Set();
+  for (let i = 0; i < 7; i++) {
+    const a = seq[i], b = seq[(i + 1) % 7];
+    if (!a || !b || a === b && plan.days.length > 1) continue;
+    const ma = muscleSets(a), mb = muscleSets(b);
+    for (const [m, n] of ma) {
+      if (n >= 4 && (mb.get(m) || 0) >= 4 && !seen.has(m)) { seen.add(m); out.push({ key: 'backToBack', p: { m, a: a.key, b: b.key } }); }
+    }
+  }
+  const all = new Set();
+  for (const d of plan.days) for (const x of d.exercises) { const e = getEx(x.id); if (e) all.add(e.muscle); }
+  if (!plan.days.some((d) => d.type === 'conditioning')) {
+    const missing = ['chest', 'back', 'shoulders', 'quads', 'hamstrings'].filter((m) => !all.has(m) && !(m === 'hamstrings' && all.has('glutes')));
+    if (missing.length) out.push({ key: 'missing', p: { m: missing } });
+  }
+  return out;
+}

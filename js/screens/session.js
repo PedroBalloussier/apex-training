@@ -17,6 +17,8 @@ import { getActivePlan } from '../data/account.js';
 import { weekKey } from '../engine/hall.js';
 import { coachTip } from '../ui/coach.js';
 import { dayLabel, repsText } from '../data/labels.js';
+import { musclesLine } from '../data/catalog.js';
+import { TECHNIQUES, CODES, WITH_BLOCKS, techOf, blocksOf, setVolume, countable, plannedTech, plannedText, groupSize, groupName, groupHint, techName } from '../data/techniques.js';
 
 let ctx = null;          // { workoutId, last: Map, best: Map, extra: {pos: n}, draft: {} }
 let elapsedTimer = null;
@@ -145,8 +147,20 @@ function render(el) {
           const phR = range ? range[0] : '';
           const wVal = s ? (s.weight_kg != null ? weightToUser(Number(s.weight_kg), unit) : '') : (d.w ?? '');
           const rVal = s ? (s.reps ?? '') : (d.r ?? '');
-          const fail = s ? s.to_failure : !!d.f;
+          const tech = s ? techOf(s) : (d.k || plannedTech(x, n) || 'normal');
+          const blocks = s ? blocksOf(s).map((b) => ({ w: b.weight_kg != null ? weightToUser(Number(b.weight_kg), unit) : '', r: b.reps ?? '' })) : (d.b || (WITH_BLOCKS.has(tech) ? [{ w: '', r: '' }] : []));
           const done = s && s.done;
+          const blockHtml = WITH_BLOCKS.has(tech) ? `
+            <div class="set-blocks" data-p="${p}" data-n="${n}">
+              ${blocks.map((b, bi) => `<div class="block-row" data-bi="${bi}">
+                <span class="block-label">${esc(t('tech.addBlock.' + tech))} ${bi + 1}</span>
+                <div class="input-unit"><input class="input input-sm num" data-bf="w" type="number" inputmode="decimal" step="0.25" min="0" value="${esc(b.w)}" placeholder="${esc(wVal || phW)}" aria-label="${esc(t('session.weight'))}" ${done ? 'disabled' : ''}><span>${esc(unit)}</span></div>
+                <div class="input-unit"><input class="input input-sm num" data-bf="r" type="number" inputmode="numeric" step="1" min="0" value="${esc(b.r)}" aria-label="${esc(t('session.reps'))}" ${done ? 'disabled' : ''}><span></span></div>
+                ${done ? '<span></span>' : `<button type="button" class="icon-btn block-x" data-bx aria-label="${esc(t('tech.removeBlock'))}">${icon('x')}</button>`}
+              </div>`).join('')}
+              ${done ? '' : `<button type="button" class="btn btn-sm btn-ghost block-add" data-badd>${icon('plus')}${esc(t('tech.addBlock.' + tech))}</button>`}
+            </div>` : '';
+          const tempoTxt = tech === 'tempo' ? (s ? s.technique_detail : d.td) : '';
           rowHtml.push(`
             <div class="set-row ${done ? 'done' : ''}" data-p="${p}" data-n="${n}">
               <span class="set-n num">${n}</span>
@@ -154,23 +168,25 @@ function render(el) {
                 value="${esc(wVal)}" placeholder="${esc(phW)}" aria-label="${esc(t('session.weight'))} ${n}" ${done ? 'disabled' : ''}><span>${esc(unit)}</span></div>
               <div class="input-unit"><input class="input input-sm num" data-f="r" type="number" inputmode="numeric" step="1" min="0"
                 value="${esc(rVal)}" placeholder="${esc(phR)}" aria-label="${esc(t('session.reps'))} ${n}" ${done ? 'disabled' : ''}><span></span></div>
-              <button type="button" class="fail-btn" data-fail aria-pressed="${fail}" title="${esc(t('session.failureHint'))}" ${done ? 'disabled' : ''}>F</button>
+              <button type="button" class="tech-btn t-${tech}" data-tech="${tech}" aria-label="${esc(t('tech.label'))}: ${esc(techName(tech))}" title="${esc(techName(tech))}${tempoTxt ? ' ' + esc(tempoTxt) : ''}" ${done ? 'disabled' : ''}>${CODES[tech] ? esc(CODES[tech]) : icon('more')}</button>
               <button type="button" class="check-btn" data-done aria-pressed="${!!done}" aria-label="${esc(t('session.markDone'))} ${n}">${icon('check')}</button>
-            </div>`);
+            </div>${blockHtml}`);
         }
         return `
-          ${g.first ? `<div class="group-label">${icon('plus')}${esc(t('session.bisetHint'))}</div>` : ''}
+          ${g.first ? `<div class="group-label">${icon('plus')}${esc(groupHint(groupSize(list, p)))}</div>` : ''}
           <article class="card ex-card ${g.inGroup ? 'grouped' : ''} ${g.first ? 'g-first' : ''} ${g.last && g.inGroup ? 'g-last' : ''}" data-ex="${p}">
             <div class="ex-card-head">
               <div class="ex-main">
                 <a class="ex-name ex-link" href="#ex-${esc(x.id)}">${esc(exerciseName(x.id, lang))}${icon('info')}</a>
                 <span class="ex-meta">${esc(x.sets)} × ${esc(repsText(x.reps))}${x.restSec && g.last ? ' · ' + esc(t('plan.rest')) + ' ' + esc(formatDuration(x.restSec, lang)) : ''}${e && e.unilateral ? ' · ' + esc(t('session.perSide')) : ''}</span>
+                ${musclesLine(x.id) ? `<span class="ex-areas">${esc(musclesLine(x.id))}</span>` : ''}
+                ${plannedText(x) ? `<span class="ex-areas planned">${esc(plannedText(x))}</span>` : ''}
               </div>
               <button type="button" class="icon-btn" data-swap="${p}" aria-label="${esc(t('plan.swap'))}" title="${esc(t('plan.swap'))}" ${anyDone ? 'disabled' : ''}>${icon('dumbbell')}</button>
             </div>
             ${x.refKg ? `<div class="sug legend">${icon('trophy')}<span>${esc(t('hall.refLoad', { w: formatWeight(x.refKg, unit, lang) }))}</span></div>` : ''}
             ${sug ? `<div class="sug ${sug.reason}">${icon(sug.reason === 'up' ? 'sparkle' : 'info')}<span>${esc(suggestionText(sug, unit, lang))}</span></div>` : ''}
-            <div class="set-head"><span>#</span><span>${esc(t('session.weight'))}</span><span>${esc(range ? t('session.reps') : t('session.time'))}</span><span></span><span></span></div>
+            <div class="set-head"><span>#</span><span>${esc(t('session.weight'))}</span><span>${esc(range ? t('session.reps') : t('session.time'))}</span><span>${esc(t('tech.label').slice(0, 4))}.</span><span></span></div>
             <div class="sets">${rowHtml.join('')}</div>
             <div class="ex-card-foot">
               <button type="button" class="btn btn-sm btn-ghost" data-add="${p}">${icon('plus')}${esc(t('session.addSet'))}</button>
@@ -198,12 +214,58 @@ function render(el) {
     const k = keyOf(row.dataset.p, row.dataset.n);
     ctx.draft[k] = { ...(ctx.draft[k] || {}), [inp.dataset.f]: inp.value };
   }));
-  el.querySelectorAll('[data-fail]').forEach((b) => b.addEventListener('click', () => {
+  // Técnica da série
+  el.querySelectorAll('[data-tech]').forEach((b) => b.addEventListener('click', () => {
     const row = b.closest('.set-row');
     const k = keyOf(row.dataset.p, row.dataset.n);
-    const v = b.getAttribute('aria-pressed') !== 'true';
-    b.setAttribute('aria-pressed', String(v));
-    ctx.draft[k] = { ...(ctx.draft[k] || {}), f: v };
+    const cur = b.dataset.tech;
+    openSheet({
+      title: t('tech.choose'),
+      content: `<div class="tech-list">${TECHNIQUES.map((tk) => `
+        <button type="button" class="tech-opt ${tk === cur ? 'on' : ''}" data-pick="${tk}">
+          <span class="tech-code t-${tk}">${CODES[tk] ? esc(CODES[tk]) : icon('more')}</span>
+          <span><strong>${esc(techName(tk))}</strong><small>${esc(t('tech.hints.' + tk))}</small></span>
+        </button>`).join('')}
+        <div class="tempo-field" hidden><label for="tempo-in">${esc(t('tech.tempoLabel'))}</label>
+          <div style="display:flex;gap:8px"><input class="input" id="tempo-in" maxlength="12" placeholder="${esc(t('tech.tempoPh'))}" value="${esc((ctx.draft[k] || {}).td || '')}">
+          <button type="button" class="btn btn-primary" data-tempo-ok>${icon('check')}</button></div></div>
+      </div>`,
+      onMount(sheet, close) {
+        const apply = (tk, td) => {
+          const d = { ...(ctx.draft[k] || {}), k: tk };
+          if (tk === 'tempo') d.td = td || ''; else delete d.td;
+          if (WITH_BLOCKS.has(tk)) { if (!d.b || !d.b.length) d.b = [{ w: '', r: '' }]; } else delete d.b;
+          ctx.draft[k] = d;
+          close(); render(el);
+        };
+        sheet.querySelectorAll('[data-pick]').forEach((o) => o.addEventListener('click', () => {
+          const tk = o.dataset.pick;
+          if (tk === 'tempo') { const f = sheet.querySelector('.tempo-field'); f.hidden = false; f.querySelector('input').focus(); return; }
+          apply(tk);
+        }));
+        sheet.querySelector('[data-tempo-ok]').addEventListener('click', () => apply('tempo', sheet.querySelector('#tempo-in').value.trim()));
+      }
+    });
+  }));
+
+  // Blocos (quedas, pausas, mini-séries)
+  const blockDraft = (box) => {
+    const k = keyOf(box.dataset.p, box.dataset.n);
+    ctx.draft[k] = ctx.draft[k] || {};
+    ctx.draft[k].b = [...box.querySelectorAll('.block-row')].map((r) => ({ w: r.querySelector('[data-bf="w"]').value, r: r.querySelector('[data-bf="r"]').value }));
+    return k;
+  };
+  el.querySelectorAll('.set-blocks input').forEach((inp) => inp.addEventListener('input', () => blockDraft(inp.closest('.set-blocks'))));
+  el.querySelectorAll('[data-badd]').forEach((b) => b.addEventListener('click', () => {
+    const k = blockDraft(b.closest('.set-blocks'));
+    ctx.draft[k].b.push({ w: '', r: '' });
+    render(el);
+  }));
+  el.querySelectorAll('[data-bx]').forEach((b) => b.addEventListener('click', () => {
+    const box = b.closest('.set-blocks');
+    const k = blockDraft(box);
+    ctx.draft[k].b.splice(Number(b.closest('.block-row').dataset.bi), 1);
+    render(el);
   }));
 
   // Marcar série como feita
@@ -215,8 +277,12 @@ function render(el) {
     b.disabled = true;
     try {
       if (existing && existing.done) {
-        await saveSet({ exercise_id: existing.exercise_id, position: p, set_number: n, reps: existing.reps, weight_kg: existing.weight_kg, to_failure: existing.to_failure, done: false });
-        ctx.draft[keyOf(p, n)] = { w: existing.weight_kg != null ? weightToUser(Number(existing.weight_kg), unit) : '', r: existing.reps ?? '', f: existing.to_failure };
+        await saveSet({ exercise_id: existing.exercise_id, position: p, set_number: n, reps: existing.reps, weight_kg: existing.weight_kg, to_failure: existing.to_failure, technique: techOf(existing), blocks: existing.blocks ?? null, technique_detail: existing.technique_detail ?? null, done: false });
+        ctx.draft[keyOf(p, n)] = {
+          w: existing.weight_kg != null ? weightToUser(Number(existing.weight_kg), unit) : '', r: existing.reps ?? '',
+          k: techOf(existing), td: existing.technique_detail || '',
+          b: blocksOf(existing).map((bl) => ({ w: bl.weight_kg != null ? weightToUser(Number(bl.weight_kg), unit) : '', r: bl.reps ?? '' }))
+        };
         return render(el);
       }
       const wInp = row.querySelector('[data-f="w"]'), rInp = row.querySelector('[data-f="r"]');
@@ -225,10 +291,17 @@ function render(el) {
       const range = repRange(x.reps);
       if (range && (rRaw === '' || !(Number(rRaw) >= 0))) { b.disabled = false; rInp.focus(); toast(t('session.needReps'), 'info'); return; }
       const weightKg = wRaw === '' ? null : Math.round(weightFromUser(wRaw, unit) * 100) / 100;
+      const tech = row.querySelector('[data-tech]').dataset.tech;
+      const dft = ctx.draft[keyOf(p, n)] || {};
+      const blocks = WITH_BLOCKS.has(tech)
+        ? (dft.b || []).filter((bl) => bl.r !== '' && Number(bl.r) > 0).map((bl) => ({
+          weight_kg: bl.w === '' ? weightKg : Math.round(weightFromUser(bl.w, unit) * 100) / 100, reps: Math.round(Number(bl.r)) }))
+        : [];
       await saveSet({
         exercise_id: x.id, position: p, set_number: n,
         reps: rRaw === '' ? null : Math.round(Number(rRaw)),
-        weight_kg: weightKg, to_failure: row.querySelector('[data-fail]').getAttribute('aria-pressed') === 'true', done: true
+        weight_kg: weightKg, to_failure: tech === 'failure', technique: tech,
+        blocks: blocks.length ? blocks : null, technique_detail: tech === 'tempo' ? (dft.td || null) : null, done: true
       });
       delete ctx.draft[keyOf(p, n)];
       const g = groupInfo(list, p);
@@ -313,10 +386,10 @@ function openFinish(el) {
   const unit = getSettings().weightUnit;
   const done = w.sets.filter((s) => s.done);
   if (!done.length) return confirmDiscard();
-  const volume = done.reduce((sum, s) => sum + Number(s.weight_kg || 0) * Number(s.reps || 0), 0);
+  const volume = done.reduce((sum, s) => sum + setVolume(s), 0);
   const prs = [];
   const maxToday = new Map();
-  for (const s of done) maxToday.set(s.exercise_id, Math.max(maxToday.get(s.exercise_id) || 0, Number(s.weight_kg || 0)));
+  for (const s of countable(done)) maxToday.set(s.exercise_id, Math.max(maxToday.get(s.exercise_id) || 0, Number(s.weight_kg || 0)));
   for (const [id, wt] of maxToday) {
     const prev = ctx.best.get(id);
     if (prev != null && prev > 0 && wt > prev) prs.push({ id, wt });

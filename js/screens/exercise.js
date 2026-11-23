@@ -7,6 +7,7 @@ import { loadCatalog, getExercise, exerciseName, equivalents } from '../data/cat
 import { guideFor } from '../data/guides.js';
 import { videoFor, youtubeSearchUrl } from '../data/videos.js';
 import { exerciseHistory } from '../data/workouts.js';
+import { countable, setText } from '../data/techniques.js';
 import { formatWeight, weightToUser } from '../utils/units.js';
 
 export const exerciseHash = (id) => `#ex-${id}`;
@@ -76,6 +77,18 @@ export default {
             </div>`}
         </div>
 
+        ${ex.primary ? `
+        <div class="card muscles-card">
+          <div class="card-head"><div class="card-title">${icon('dumbbell')}<h2>${esc(t('exercise.musclesWorked'))}</h2></div></div>
+          <div class="muscle-groups">
+            <div><span class="eyebrow">${esc(t('exercise.primary'))}</span>
+              <div class="chips">${ex.primary.map((a) => `<span class="chip chip-strong">${esc(t('areas.' + a))}</span>`).join('')}</div></div>
+            ${ex.secondary && ex.secondary.length ? `<div><span class="eyebrow">${esc(t('exercise.secondary'))}</span>
+              <div class="chips">${ex.secondary.map((a) => `<span class="chip">${esc(t('areas.' + a))}</span>`).join('')}</div></div>` : ''}
+          </div>
+          <p class="setting-hint" style="margin-top:10px">${esc(t('exercise.musclesHint'))}</p>
+        </div>` : ''}
+
         ${guide ? `
         <div class="grid grid-2">
           <div class="card">
@@ -126,9 +139,10 @@ export default {
         <p class="muted">${esc(t('exercise.noHistory'))}</p>`;
       return;
     }
-    const best = Math.max(...sessions.flatMap((s) => s.sets.map((x) => Number(x.weight_kg || 0))));
-    const best1rm = Math.max(...sessions.flatMap((s) => s.sets.map((x) => e1rm(Number(x.weight_kg || 0), Number(x.reps || 0)))));
-    const chrono = [...sessions].reverse().slice(-12).map((s) => Math.max(...s.sets.map((x) => Number(x.weight_kg || 0))));
+    const work = (s) => countable(s.sets);
+    const best = Math.max(0, ...sessions.flatMap((s) => work(s).map((x) => Number(x.weight_kg || 0))));
+    const best1rm = Math.max(0, ...sessions.flatMap((s) => work(s).map((x) => e1rm(Number(x.weight_kg || 0), Number(x.reps || 0)))));
+    const chrono = [...sessions].reverse().slice(-12).map((s) => Math.max(0, ...work(s).map((x) => Number(x.weight_kg || 0))));
     box.innerHTML = `
       <div class="card-head"><span class="eyebrow">${esc(t('exercise.history'))}</span><span class="chip num">${esc(t('exercise.sessions', { n: sessions.length }))}</span></div>
       <div class="kpis" style="margin-bottom:12px">
@@ -140,7 +154,7 @@ export default {
       <details class="hist-more" data-collapse="ex-hist"><summary>${icon('chevron')}<span>${esc(t('exercise.sessions', { n: sessions.length }))}</span></summary>
       <ul class="hist-list">${sessions.slice(0, 8).map((s) => `
         <li><span class="hist-date">${esc(fmtDate(s.date, lang))}</span>
-          <span class="hist-sets num">${esc(s.sets.map((x) => `${x.weight_kg != null ? weightToUser(Number(x.weight_kg), unit) : '—'}×${x.reps ?? '—'}${x.to_failure ? 'F' : ''}`).join('  ·  '))}</span></li>`).join('')}
+          <span class="hist-sets num">${esc(s.sets.map((x) => setText(x, (kg) => weightToUser(kg, unit))).join('  ·  '))}</span></li>`).join('')}
       </ul></details>`;
   }
 };
