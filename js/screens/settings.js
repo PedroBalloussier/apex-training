@@ -6,6 +6,7 @@ import { store } from '../data/store.js';
 import { toast, openSheet } from '../ui/feedback.js';
 import { formatDuration } from '../utils/units.js';
 import { getLanguage } from '../i18n/index.js';
+import { getUser, getProfile, signOut } from '../data/account.js';
 
 const REST_MIN = 30, REST_MAX = 300, REST_STEP = 15;
 
@@ -37,6 +38,18 @@ export default {
           <h1>${esc(t('settings.title'))}</h1>
           <p class="muted">${esc(t('settings.subtitle'))}</p>
         </header>
+
+        ${getUser() ? `
+        <div class="card">
+          <div class="card-head"><div class="card-title">${icon('users')}<h2>${esc(t('account.title'))}</h2></div></div>
+          <div class="settings-group">
+            ${row('users', (getProfile() && getProfile().name) || t('account.signedAs'), getUser().email,
+              `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                <a class="btn btn-sm" href="#perfil">${esc(t('account.editProfile'))}</a>
+                <button type="button" class="btn btn-sm btn-ghost" data-act="signout">${esc(t('account.signOut'))}</button>
+              </div>`)}
+          </div>
+        </div>` : ''}
 
         <div class="grid grid-2">
           <div class="card">
@@ -89,6 +102,9 @@ export default {
 
         <p class="faint" style="text-align:center;font-size:13px">${esc(t('app.name'))} · ${esc(t('settings.version'))} ${esc(t('app.version'))}</p>
       </section>`;
+
+    const so = el.querySelector('[data-act="signout"]');
+    if (so) so.addEventListener('click', () => signOut());
 
     // Segmentados e swatches
     el.querySelectorAll('[data-setting]').forEach((group) => {

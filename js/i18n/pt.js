@@ -1,8 +1,8 @@
 export default {
-  app: { name: 'Apex', version: 'v0.1' },
+  app: { name: 'Apex', version: 'v0.2' },
   nav: {
     today: 'Hoje', plan: 'Plano', calendar: 'Calendário', dashboard: 'Progresso',
-    hall: 'Hall da Fama', party: 'Party', settings: 'Configurações', more: 'Mais',
+    profile: 'Perfil', triage: 'Triagem', hall: 'Hall da Fama', party: 'Party', settings: 'Configurações', more: 'Mais',
     collapse: 'Recolher menu', expand: 'Expandir menu'
   },
   top: {
@@ -84,7 +84,7 @@ export default {
     training: 'Treino',
     rest: 'Descanso padrão', restHint: 'Tempo entre séries quando o plano não define',
     data: 'Seus dados',
-    storageLocal: 'Os dados ficam salvos neste aparelho. A sincronização com a conta chega na próxima etapa.',
+    storageLocal: 'Perfil, triagens e planos ficam na sua conta. Estas configurações ficam salvas neste aparelho.',
     storageMemory: 'Este navegador não permite salvar dados. Tudo será perdido ao fechar a página.',
     export: 'Exportar dados', exportHint: 'Gera um arquivo JSON com tudo o que está salvo',
     import: 'Importar dados', importHint: 'Restaura um arquivo exportado antes',

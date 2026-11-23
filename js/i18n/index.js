@@ -1,7 +1,9 @@
-import pt from './pt.js';
-import en from './en.js';
+import pt1 from './pt.js';
+import en1 from './en.js';
+import pt2 from './pt2.js';
+import en2 from './en2.js';
 
-const DICTS = { pt, en };
+const DICTS = { pt: { ...pt1, ...pt2 }, en: { ...en1, ...en2 } };
 let lang = 'pt';
 
 export function setLanguage(l) {
@@ -19,4 +21,10 @@ export function t(key, vars) {
   if (s === undefined) return key;
   if (vars) s = String(s).replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? `{${k}}`));
   return s;
+}
+
+/** Lista (ex.: dias da semana). */
+export function tl(key) {
+  const v = key.split('.').reduce((o, k) => (o ? o[k] : undefined), DICTS[lang]);
+  return Array.isArray(v) ? v : [];
 }

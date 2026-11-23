@@ -1,8 +1,8 @@
 export default {
-  app: { name: 'Apex', version: 'v0.1' },
+  app: { name: 'Apex', version: 'v0.2' },
   nav: {
     today: 'Today', plan: 'Plan', calendar: 'Calendar', dashboard: 'Progress',
-    hall: 'Hall of Fame', party: 'Party', settings: 'Settings', more: 'More',
+    profile: 'Profile', triage: 'Assessment', hall: 'Hall of Fame', party: 'Party', settings: 'Settings', more: 'More',
     collapse: 'Collapse menu', expand: 'Expand menu'
   },
   top: {
@@ -84,7 +84,7 @@ export default {
     training: 'Training',
     rest: 'Default rest', restHint: "Time between sets when the plan doesn't set one",
     data: 'Your data',
-    storageLocal: 'Data is saved on this device. Account sync arrives in the next stage.',
+    storageLocal: 'Profile, assessments and plans live in your account. These settings are saved on this device.',
     storageMemory: "This browser doesn't allow saving data. Everything is lost when the page closes.",
     export: 'Export data', exportHint: 'Creates a JSON file with everything saved',
     import: 'Import data', importHint: 'Restores a previously exported file',

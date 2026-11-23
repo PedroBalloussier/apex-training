@@ -5,21 +5,28 @@ import { loadSettings, getSettings, updateSettings, onSettings } from './data/se
 import { toast, openSheet } from './ui/feedback.js';
 import today from './screens/today.js';
 import settingsScreen from './screens/settings.js';
+import planScreen from './screens/plan.js';
+import profileScreen from './screens/profile.js';
+import triageScreen from './screens/triage.js';
 import { soonScreen } from './screens/soon.js';
 
 // Rotas: o hash é o nome em português (sem "settings", reservado em alguns ambientes)
 const ROUTES = [
   { id: 'today', hash: 'hoje', ic: 'home', screen: today, tab: true },
-  { id: 'plan', hash: 'plano', ic: 'plan', screen: soonScreen({ key: 'plan', ic: 'plan', stage: 3 }), tab: true },
+  { id: 'plan', hash: 'plano', ic: 'plan', screen: planScreen, tab: true },
   { id: 'calendar', hash: 'calendario', ic: 'calendar', screen: soonScreen({ key: 'calendar', ic: 'calendar', stage: 4 }), tab: true },
   { id: 'dashboard', hash: 'progresso', ic: 'chart', screen: soonScreen({ key: 'dashboard', ic: 'chart', stage: 5 }), tab: true },
   { id: 'hall', hash: 'hall', ic: 'trophy', screen: soonScreen({ key: 'hall', ic: 'trophy', stage: 6 }), group: 'social' },
   { id: 'party', hash: 'party', ic: 'users', screen: soonScreen({ key: 'party', ic: 'users', stage: 7 }), group: 'social' },
-  { id: 'settings', hash: 'config', ic: 'gear', screen: settingsScreen, group: 'bottom' }
+  { id: 'settings', hash: 'config', ic: 'gear', screen: settingsScreen, group: 'bottom' },
+  { id: 'profile', hash: 'perfil', ic: 'users', screen: profileScreen, hidden: true },
+  { id: 'triage', hash: 'triagem', ic: 'sparkle', screen: triageScreen, hidden: true }
 ];
 
 const app = document.getElementById('app');
 let currentId = 'today';
+let account = null;          // módulo de conta (carregado sob demanda)
+let mode = 'loading';        // loading | error | auth | app
 
 function routeFromHash() {
   const h = (location.hash || '').replace('#', '');
@@ -83,7 +90,7 @@ function renderShell() {
 }
 
 function openMore() {
-  const items = ROUTES.filter((r) => !r.tab);
+  const items = ROUTES.filter((r) => !r.tab && !r.hidden);
   openSheet({
     title: t('nav.more'),
     content: `<div class="more-menu">${items.map((r) => navLink(r)).join('')}</div>`,
@@ -93,16 +100,50 @@ function openMore() {
   });
 }
 
-function renderScreen() {
+async function renderScreen() {
   const main = document.getElementById('main');
   const route = ROUTES.find((r) => r.id === currentId);
-  route.screen.render(main);
   document.title = `${t('nav.' + currentId)} · ${t('app.name')}`;
+  try {
+    await route.screen.render(main);
+  } catch (err) {
+    console.error('[Apex]', err);
+    main.innerHTML = `<div class="center-state"><div><p class="muted">${esc(t('auth.errGeneric'))}</p></div></div>`;
+  }
 }
 
-function render() {
+function renderState(kind) {
+  app.classList.remove('side-collapsed');
+  if (kind === 'loading') {
+    app.innerHTML = '<div class="center-state"><div class="spinner" aria-label="..."></div></div>';
+  } else {
+    app.innerHTML = `<div class="center-state"><div style="display:grid;gap:14px;justify-items:center">
+      <p class="muted" style="max-width:360px">${esc(t('auth.loadError'))}</p>
+      <button class="btn" data-retry>${esc(t('auth.retry'))}</button></div></div>`;
+    app.querySelector('[data-retry]').addEventListener('click', () => location.reload());
+  }
+}
+
+/** Regras de acesso às telas: sem conta → entrar; perfil incompleto → perfil. */
+function guardRoute() {
+  if (account.profileComplete()) return;
+  if (currentId !== 'profile' && currentId !== 'settings') {
+    currentId = 'profile';
+    history.replaceState(null, '', '#perfil');
+  }
+}
+
+async function render() {
+  if (mode === 'loading' || mode === 'error') return renderState(mode);
+  if (!account.getSession()) {
+    mode = 'auth';
+    const { renderAuth } = await import('./screens/auth.js');
+    return renderAuth(app);
+  }
+  mode = 'app';
+  guardRoute();
   renderShell();
-  renderScreen();
+  await renderScreen();
 }
 
 function onRoute() {
@@ -117,15 +158,32 @@ async function init() {
   const s = await loadSettings();
   setLanguage(s.language);
   currentId = routeFromHash().id;
-  render();
+  renderState('loading');
+
+  try {
+    account = await import('./data/account.js');
+    await account.initAccount();
+    mode = 'app';
+  } catch (err) {
+    console.error('[Apex] init', err);
+    mode = 'error';
+  }
+  await render();
 
   window.addEventListener('hashchange', onRoute);
+  if (account) {
+    let hadSession = !!account.getSession();
+    account.onAccount(({ session }) => {
+      // Só redesenha quando a pessoa entra ou sai; as telas cuidam do resto
+      if (!!session !== hadSession) { hadSession = !!session; render(); }
+    });
+  }
 
   onSettings((next, prev) => {
     if (next.language !== prev.language) {
       setLanguage(next.language);
       render();
-    } else if (next.mode !== prev.mode || next.sidebarCollapsed !== prev.sidebarCollapsed) {
+    } else if (mode === 'app' && (next.mode !== prev.mode || next.sidebarCollapsed !== prev.sidebarCollapsed)) {
       renderShell();
       renderScreen();
     }

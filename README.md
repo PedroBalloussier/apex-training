@@ -2,7 +2,7 @@
 
 App de treino: plano montado pela triagem, troca de exercícios por equivalentes, registro de séries, progresso, Hall da Fama e Party entre amigos.
 
-Nome de trabalho. Versão atual: **v0.1 (etapa 1, fundação)**.
+Nome de trabalho. Versão atual: **v0.2 (etapa 2: cadastro, triagem e planos)**.
 
 ## Estrutura
 
@@ -13,7 +13,14 @@ sw.js               cache offline
 css/                tokens de tema (Emerald e Sunset, dark e light), layout e componentes
 js/app.js           inicialização, navegação e estrutura (topbar, menu lateral, abas)
 js/i18n/            textos em português (padrão) e inglês
-js/data/store.js    camada de dados (local hoje, Supabase na etapa 2)
+js/data/store.js    dados locais (configurações)
+js/data/supabase.js cliente Supabase (login e banco)
+js/data/account.js  conta, perfil, triagens e planos
+js/data/catalog.js  catálogo de exercícios
+js/engine/          motor que gera os planos a partir da triagem
+data/exercises.json catálogo (166 exercícios com etiquetas de equivalência)
+supabase/schema.sql tabelas e regras de acesso do banco
+tools/              script que gera o catálogo
 js/data/settings.js configurações do usuário
 js/utils/units.js   conversão kg/lb e cm/in (armazenamento interno em kg e cm)
 js/ui/              ícones, toasts e sheets
@@ -34,7 +41,7 @@ Abra http://localhost:8000.
 
 0. Conceito (feito)
 1. Fundação (feito)
-2. Cadastro, triagem, catálogo de exercícios e geração de planos
+2. Cadastro, triagem, catálogo de exercícios e geração de planos (feito)
 3. Hoje, Plano e Sessão
 4. Exercício e Calendário
 5. Dashboard, corpo, ciclo, relatório e nova triagem
