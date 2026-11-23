@@ -6,9 +6,10 @@ import { store } from '../data/store.js';
 import { toast, openSheet } from '../ui/feedback.js';
 import { formatDuration } from '../utils/units.js';
 import { getLanguage } from '../i18n/index.js';
-import { getUser, getProfile, signOut } from '../data/account.js';
+import { getUser, getProfile, signOut, getActivePlan } from '../data/account.js';
 import { demoActive, exitDemo } from '../data/demo.js';
 import { exportWorkoutsCsv, exportBodyCsv } from '../data/export-csv.js';
+import { startTour, showWelcome } from '../ui/coach.js';
 import { openDemoSheet } from '../ui/demo-ui.js';
 
 const REST_MIN = 30, REST_MAX = 300, REST_STEP = 15;
@@ -90,6 +91,8 @@ export default {
                   <output class="num" data-rest-out aria-live="polite">${esc(formatDuration(s.restSeconds, lang))}</output>
                   <button type="button" class="icon-btn" data-rest="1" aria-label="+${REST_STEP} s">${icon('plus')}</button>
                 </div>`)}
+              ${row('quote', t('coach.voice'), t('coach.voiceHint'), seg('coachVoice', [['off', t('coach.off')], ['on', t('coach.on')]], s.coachVoice === 'on' ? 'on' : 'off'))}
+              ${row('sparkle', t('coach.replay'), t('coach.replayHint'), `<button type="button" class="btn btn-sm" data-act="tour">${icon('sparkle')}${esc(t('coach.replay'))}</button>`)}
             </div>
         </div>
 
@@ -123,6 +126,8 @@ export default {
     }); };
     csvBtn('[data-act="csv-workouts"]', exportWorkoutsCsv);
     csvBtn('[data-act="csv-body"]', exportBodyCsv);
+    const tourBtn = el.querySelector('[data-act="tour"]');
+    if (tourBtn) tourBtn.addEventListener('click', () => (getActivePlan() ? startTour(0) : showWelcome()));
     const dm = el.querySelector('[data-act="demo"]');
     if (dm) dm.addEventListener('click', openDemoSheet);
     const dx = el.querySelector('[data-act="demo-exit"]');

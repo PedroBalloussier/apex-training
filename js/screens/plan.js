@@ -118,7 +118,7 @@ export default {
             <span class="day-badge day-${d.key}">${d.key}</span>${esc(t('dayTypes.' + d.type))}</button>`).join('')}
         </div>
 
-        <div class="card">
+        <div class="card plan-day">
           <div class="card-head">
             <div class="card-title"><span class="day-badge day-${day.key}">${day.key}</span><h2>${esc(t('dayTypes.' + day.type))}</h2></div>
             <span class="chip num">${esc(t('results.exercises', { n: day.exercises.length }))}</span>

@@ -12,6 +12,7 @@ import {
 } from '../data/party.js';
 import { diffBadge } from '../ui/difficulty.js';
 import { challengeDifficulty } from '../engine/difficulty.js';
+import { coachTip } from '../ui/coach.js';
 import { collapsible, bindCollapsibles } from '../ui/collapse.js';
 
 const SWATCH = ['#F472B6', '#818CF8', '#FBBF24', '#38BDF8', '#34D399', '#F87171', '#C084FC'];
@@ -429,6 +430,7 @@ async function renderDetail(el, id) {
     </section>`;
 
   bindCollapsibles(el);
+  coachTip('party');
   const on = (sel, fn) => el.querySelectorAll(sel).forEach((b) => b.addEventListener('click', fn));
   on('[data-copy]', () => copyText(inviteUrl(p.code)));
   on('[data-share]', () => shareInvite(p));

@@ -10,6 +10,7 @@ import { deriveRows, bmiBand, whtrBand, movingAverage } from '../data/bodymetric
 import { cycleInfo } from '../data/stats.js';
 import { weightToUser, weightFromUser, lengthToUser, lengthFromUser, formatWeight, formatLength } from '../utils/units.js';
 import { lineChart } from '../ui/charts.js';
+import { coachTip } from '../ui/coach.js';
 import { collapsible, bindCollapsibles } from '../ui/collapse.js';
 
 const isLength = (f) => f.endsWith('_cm');
@@ -177,6 +178,7 @@ export default {
           </ul>` })}` : ''}
       </section>`;
     bindCollapsibles(el);
+    coachTip('body');
 
     // ---------- Gráfico e variação (re-render parcial) ----------
     const chartBox = el.querySelector('.body-chart');

@@ -745,3 +745,43 @@ a.party-card:hover { border-color: var(--line-2); }
 .pass-toggle svg { width: 19px; height: 19px; }
 .csv-btns { display: flex; gap: 8px; }
 .csv-btns .btn { flex: 1; justify-content: center; }
+
+/* ---------- Apex Coach ---------- */
+body.coach-open { overflow: hidden; }
+.coach-welcome { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 16px; background: rgba(4, 8, 12, .72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); animation: coachIn .3s var(--ease, ease) both; }
+.cw-card { width: min(440px, 100%); max-height: calc(100dvh - 32px); overflow: auto; border-radius: 26px; background: var(--surface); border: 1px solid var(--line-2); box-shadow: 0 24px 80px rgba(0,0,0,.55); }
+.cw-img { display: block; width: 100%; aspect-ratio: 4 / 3.2; object-fit: cover; object-position: center 18%; }
+.cw-body { padding: 18px 20px 20px; display: grid; gap: 12px; }
+.cw-text, .ct-text { font-size: 17px; line-height: 1.45; font-weight: 600; min-height: 3.2em; margin: 0; cursor: default; }
+.cw-text.typing::after, .ct-text.typing::after, .coach-tip p.typing::after { content: ''; display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -2px; background: var(--primary); animation: caret .8s steps(1) infinite; }
+.cw-dots { display: flex; gap: 6px; }
+.cw-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-2); transition: width .2s, background .2s; }
+.cw-dots i.on { width: 20px; border-radius: 4px; background: var(--primary); }
+.cw-actions, .ct-actions { display: flex; justify-content: space-between; gap: 10px; }
+.cw-actions .btn-primary { flex: 1; justify-content: center; }
+.coach-tour { position: fixed; inset: 0; z-index: 200; }
+.ct-shade { position: absolute; inset: 0; background: rgba(4, 8, 12, .66); }
+.ct-spot { position: fixed; border-radius: 18px; box-shadow: 0 0 0 9999px rgba(4, 8, 12, .66), 0 0 0 2px var(--primary), 0 0 28px color-mix(in srgb, var(--primary) 45%, transparent); transition: top .3s, left .3s, width .3s, height .3s; pointer-events: none; }
+.ct-bubble { position: fixed; left: 50%; transform: translateX(-50%); width: min(440px, calc(100vw - 24px)); padding: 14px 16px 14px; border-radius: 22px; background: var(--surface); border: 1px solid var(--line-2); box-shadow: 0 18px 60px rgba(0,0,0,.5); display: grid; gap: 10px; transition: top .3s, bottom .3s, opacity .2s; }
+.ct-bubble[data-pos="bottom"] { bottom: calc(84px + env(safe-area-inset-bottom)); }
+.ct-bubble[data-pos="top"] { top: calc(70px + env(safe-area-inset-top)); }
+.ct-bubble[data-pos="center"] { top: 50%; transform: translate(-50%, -50%); }
+@media (min-width: 900px) { .ct-bubble[data-pos="bottom"] { bottom: 28px; } .ct-bubble { margin-left: 115px; } .side-collapsed .ct-bubble { margin-left: 37px; } }
+.ct-bubble.ct-wait { opacity: .0; }
+.ct-head { display: flex; align-items: center; gap: 10px; }
+.ct-head img, .coach-tip img { width: 40px; height: 40px; border-radius: 13px; object-fit: cover; flex: none; box-shadow: 0 0 0 1px var(--line-2), 0 0 16px color-mix(in srgb, var(--primary) 30%, transparent); }
+.ct-head > div { display: grid; flex: 1; line-height: 1.2; }
+.ct-head strong { font-size: 14px; }
+.ct-count { font-size: 12px; color: var(--text-3); }
+.ct-text { font-size: 16px; min-height: 2.9em; }
+.ct-x svg { width: 18px; height: 18px; }
+.coach-tip { position: fixed; z-index: 150; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom)); width: min(460px, calc(100vw - 24px)); display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; align-items: start; padding: 14px 16px; border-radius: 20px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--line-2)); box-shadow: 0 18px 60px rgba(0,0,0,.45); animation: tipIn .3s var(--ease, ease) both; }
+.coach-tip.out { opacity: 0; transition: opacity .2s; }
+.coach-tip .tip-body strong { font-size: 13px; color: var(--primary); }
+.coach-tip p { margin: 2px 0 0; font-size: 14.5px; line-height: 1.45; }
+.coach-tip [data-ok] { grid-column: 2; justify-self: end; }
+@media (min-width: 900px) { .coach-tip { bottom: 24px; margin-left: 115px; } }
+@keyframes coachIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tipIn { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes caret { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .coach-welcome, .coach-tip { animation: none; } .ct-spot, .ct-bubble { transition: none; } }

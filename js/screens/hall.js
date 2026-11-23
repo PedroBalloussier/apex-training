@@ -14,6 +14,7 @@ import { formatWeight, formatDuration } from '../utils/units.js';
 import { startChallenge } from './start.js';
 import { diffBadge } from '../ui/difficulty.js';
 import { quotesFor } from '../data/quotes.js';
+import { coachTip } from '../ui/coach.js';
 import { challengeDifficulty } from '../engine/difficulty.js';
 
 let filter = 'all';
@@ -104,6 +105,7 @@ function detail(el, c) {
       <p class="setting-hint" style="text-align:center">${esc(t('hall.disclaimer'))}</p>
     </section>`;
   el.querySelector('[data-start]').addEventListener('click', () => startChallenge(c));
+  coachTip('hall');
 }
 
 export default {

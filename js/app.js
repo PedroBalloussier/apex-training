@@ -23,6 +23,7 @@ import { demoActive } from './data/demo.js';
 import { resetWorkouts } from './data/workouts.js';
 import partyScreen, { inviteScreen } from './screens/party.js';
 import { resetParty } from './data/party.js';
+import { coachAuto } from './ui/coach.js';
 
 // Rotas: o hash é o nome em português (sem "settings", reservado em alguns ambientes)
 const ROUTES = [
@@ -135,6 +136,7 @@ async function renderScreen() {
   document.title = `${t('nav.' + currentId)} · ${t('app.name')}`;
   try {
     await route.screen.render(main, currentParam);
+    if (!currentParam || currentId === 'today') coachAuto(currentId);
   } catch (err) {
     console.error('[Apex]', err);
     main.innerHTML = `<div class="center-state"><div><p class="muted">${esc(t('auth.errGeneric'))}</p></div></div>`;

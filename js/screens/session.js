@@ -15,6 +15,7 @@ import { markDone } from '../data/hall.js';
 import { logWorkoutPoints } from '../data/party.js';
 import { getActivePlan } from '../data/account.js';
 import { weekKey } from '../engine/hall.js';
+import { coachTip } from '../ui/coach.js';
 import { dayLabel, repsText } from '../data/labels.js';
 
 let ctx = null;          // { workoutId, last: Map, best: Map, extra: {pos: n}, draft: {} }
@@ -376,5 +377,6 @@ export default {
     }
     render(el);
     if (rest.end > Date.now()) drawRest();
+    coachTip('session', { delay: 900 });
   }
 };
