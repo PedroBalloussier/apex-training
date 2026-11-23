@@ -10,6 +10,7 @@ import { workoutsBetween, workoutSets } from '../data/workouts.js';
 import { formatWeight, formatDuration, weightToUser } from '../utils/units.js';
 import { exerciseList } from './plan.js';
 import { startDay } from './start.js';
+import { dayLabel } from '../data/labels.js';
 
 let viewYear = null, viewMonth = null;
 
@@ -130,7 +131,7 @@ export default {
           const byEx = new Map();
           for (const s of sets) { if (!byEx.has(s.exercise_id)) byEx.set(s.exercise_id, []); byEx.get(s.exercise_id).push(s); }
           blocks.push(`
-            <div class="card-title" style="margin-bottom:10px"><span class="day-badge day-${esc(w.day_key)}">${esc(w.day_key)}</span><h3>${esc(t('dayTypes.' + w.day_type))}</h3></div>
+            <div class="card-title" style="margin-bottom:10px"><span class="day-badge day-${esc(w.day_key)}">${esc(w.day_key)}</span><h3>${esc(dayLabel(w.day_type))}</h3></div>
             <div class="plan-meta" style="margin-bottom:10px">
               <span class="chip">${esc(formatDuration(Math.max(60, (w.duration_sec || 0) - ((w.duration_sec || 0) % 60)), lang))}</span>
               <span class="chip">${esc(t('session.setsDone'))}: ${sets.length}</span>

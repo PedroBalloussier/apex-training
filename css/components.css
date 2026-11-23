@@ -545,3 +545,31 @@ body.demo .main { padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) +
   .cal-cell { aspect-ratio: auto; height: 76px; }
   .cal-cell.empty { height: 76px; }
 }
+
+/* ---------- Hall da Fama ---------- */
+.avatar { width: 48px; height: 48px; border-radius: 16px; flex: none; display: grid; place-items: center; font-weight: 800; font-size: 16px; letter-spacing: -.02em; color: #0B0F14; }
+.avatar.big { width: 64px; height: 64px; border-radius: 20px; font-size: 21px; }
+.cat-film { background: linear-gradient(135deg, #F472B6, #C084FC); }
+.cat-fight { background: linear-gradient(135deg, #F87171, #FBBF24); }
+.cat-athletes { background: linear-gradient(135deg, #38BDF8, #34D399); }
+.cat-bodybuilding { background: linear-gradient(135deg, #FBBF24, #F59E0B); }
+.cat-legends { background: linear-gradient(135deg, #A3A3A3, #E5E7EB); }
+.hall-row { display: flex; align-items: center; gap: 14px; }
+.hall-title { color: var(--text-2); font-weight: 600; margin-top: 2px; }
+.hall-title.sm { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hall-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.hall-current { border-color: color-mix(in srgb, var(--warning) 45%, var(--line)); }
+.hall-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; transition: border-color .18s var(--ease), transform .18s var(--ease); }
+.hall-card:hover { border-color: var(--line-2); transform: translateY(-2px); }
+.hall-card h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.done-badge { margin-left: auto; width: 26px; height: 26px; border-radius: 50%; background: var(--success); color: #04210F; display: grid; place-items: center; flex: none; }
+.done-badge svg { width: 15px; height: 15px; stroke-width: 2.6; }
+.hall-hero { display: flex; gap: 18px; align-items: center; }
+.hall-hero .avatar { width: 84px; height: 84px; border-radius: 26px; font-size: 28px; }
+.hall-hero-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hall-hero-text .plan-meta { margin-top: 8px; }
+@media (max-width: 480px) { .hall-hero { flex-direction: column; align-items: flex-start; } }
+.sug.legend { color: var(--text); border-color: color-mix(in srgb, var(--warning) 40%, var(--line)); background: color-mix(in srgb, var(--warning) 9%, var(--surface-2)); }
+.sug.legend svg { color: var(--warning); }
+.hall-mini h3 { font-size: 15.5px; margin-top: 2px; }
+.day-H { background: linear-gradient(135deg, #FBBF24, #F59E0B); }

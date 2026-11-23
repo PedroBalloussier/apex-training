@@ -15,6 +15,8 @@ import exerciseScreen from './screens/exercise.js';
 import dashboardScreen from './screens/dashboard.js';
 import bodyScreen from './screens/body.js';
 import reportScreen from './screens/report.js';
+import hallScreen from './screens/hall.js';
+import { resetHall } from './data/hall.js';
 import { resetBody } from './data/body.js';
 import { demoBar, bindDemoBar } from './ui/demo-ui.js';
 import { demoActive } from './data/demo.js';
@@ -28,7 +30,8 @@ const ROUTES = [
   { id: 'calendar', hash: 'calendario', ic: 'calendar', screen: calendarScreen, tab: true },
   { id: 'dashboard', hash: 'progresso', ic: 'chart', screen: dashboardScreen, tab: true },
   { id: 'body', hash: 'corpo', ic: 'scale', screen: bodyScreen, group: 'progress' },
-  { id: 'hall', hash: 'hall', ic: 'trophy', screen: soonScreen({ key: 'hall', ic: 'trophy', stage: 6 }), group: 'social' },
+  { id: 'hall', hash: 'hall', ic: 'trophy', screen: hallScreen, group: 'social' },
+  { id: 'hall', hash: 'hall-', prefix: true, ic: 'trophy', screen: hallScreen, hidden: true },
   { id: 'party', hash: 'party', ic: 'users', screen: soonScreen({ key: 'party', ic: 'users', stage: 7 }), group: 'social' },
   { id: 'settings', hash: 'config', ic: 'gear', screen: settingsScreen, group: 'bottom' },
   { id: 'profile', hash: 'perfil', ic: 'users', screen: profileScreen, hidden: true },
@@ -200,7 +203,7 @@ async function init() {
     let hadSession = !!account.getSession();
     account.onAccount(({ session }) => {
       // Só redesenha quando a pessoa entra ou sai; as telas cuidam do resto
-      if (!!session !== hadSession) { hadSession = !!session; resetWorkouts(); resetBody(); render(); }
+      if (!!session !== hadSession) { hadSession = !!session; resetWorkouts(); resetBody(); resetHall(); render(); }
     });
   }
 

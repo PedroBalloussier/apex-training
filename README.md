@@ -2,7 +2,7 @@
 
 App de treino: plano montado pela triagem, troca de exercícios por equivalentes, registro de séries, progresso, Hall da Fama e Party entre amigos.
 
-Nome de trabalho. Versão atual: **v0.5 (etapa 5: progresso, corpo, ciclo e relatório)**.
+Nome de trabalho. Versão atual: **v0.6 (etapa 6: Hall da Fama e frases)**.
 
 ## Estrutura
 
@@ -22,6 +22,7 @@ data/exercises.json catálogo (166 exercícios com etiquetas de equivalência)
 supabase/schema.sql tabelas e regras de acesso do banco (etapa 2)
 supabase/schema_etapa3.sql treinos e séries (etapa 3)
 supabase/schema_etapa5.sql medidas corporais (etapa 5)
+supabase/schema_etapa6.sql desafios concluídos (etapa 6)
 tools/              scripts que geram o catálogo e o arquivo de demonstração
 data/demo-apex.json dados simulados para o modo demonstração
 js/data/settings.js configurações do usuário
@@ -48,6 +49,6 @@ Abra http://localhost:8000.
 3. Hoje, Plano e Sessão (feito)
 4. Exercício e Calendário (feito)
 5. Dashboard, corpo, ciclo, relatório e nova triagem (feito)
-6. Hall da Fama e banco de frases
+6. Hall da Fama e banco de frases (feito)
 7. Party
 8. Verificação completa

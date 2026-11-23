@@ -11,6 +11,8 @@ import {
 import { suggest, repRange } from '../engine/progression.js';
 import { weightToUser, weightFromUser, formatWeight, formatDuration } from '../utils/units.js';
 import { openSwap } from '../ui/swap.js';
+import { markDone } from '../data/hall.js';
+import { dayLabel, repsText } from '../data/labels.js';
 
 let ctx = null;          // { workoutId, last: Map, best: Map, extra: {pos: n}, draft: {} }
 let elapsedTimer = null;
@@ -116,7 +118,7 @@ function render(el) {
         <div class="card-title">
           <span class="day-badge day-${esc(w.day_key)}">${esc(w.day_key)}</span>
           <div><span class="eyebrow">${esc(t('session.eyebrow'))} · <span class="num" data-elapsed></span></span>
-            <h1>${esc(t('dayTypes.' + w.day_type))}</h1></div>
+            <h1>${esc(dayLabel(w.day_type))}</h1></div>
         </div>
         <button type="button" class="icon-btn" data-menu aria-label="${esc(t('plan.actions'))}">${icon('more')}</button>
       </header>
@@ -158,10 +160,11 @@ function render(el) {
             <div class="ex-card-head">
               <div class="ex-main">
                 <a class="ex-name ex-link" href="#ex-${esc(x.id)}">${esc(exerciseName(x.id, lang))}${icon('info')}</a>
-                <span class="ex-meta">${esc(x.sets)} × ${esc(x.reps)}${x.restSec && g.last ? ' · ' + esc(t('plan.rest')) + ' ' + esc(formatDuration(x.restSec, lang)) : ''}${e && e.unilateral ? ' · ' + esc(t('session.perSide')) : ''}</span>
+                <span class="ex-meta">${esc(x.sets)} × ${esc(repsText(x.reps))}${x.restSec && g.last ? ' · ' + esc(t('plan.rest')) + ' ' + esc(formatDuration(x.restSec, lang)) : ''}${e && e.unilateral ? ' · ' + esc(t('session.perSide')) : ''}</span>
               </div>
               <button type="button" class="icon-btn" data-swap="${p}" aria-label="${esc(t('plan.swap'))}" title="${esc(t('plan.swap'))}" ${anyDone ? 'disabled' : ''}>${icon('dumbbell')}</button>
             </div>
+            ${x.refKg ? `<div class="sug legend">${icon('trophy')}<span>${esc(t('hall.refLoad', { w: formatWeight(x.refKg, unit, lang) }))}</span></div>` : ''}
             ${sug ? `<div class="sug ${sug.reason}">${icon(sug.reason === 'up' ? 'sparkle' : 'info')}<span>${esc(suggestionText(sug, unit, lang))}</span></div>` : ''}
             <div class="set-head"><span>#</span><span>${esc(t('session.weight'))}</span><span>${esc(range ? t('session.reps') : t('session.time'))}</span><span></span><span></span></div>
             <div class="sets">${rowHtml.join('')}</div>
@@ -337,7 +340,10 @@ function openFinish(el) {
       okBtn.addEventListener('click', async () => {
         okBtn.disabled = true;
         try {
-          await finishWorkout();
+          const doneRow = await finishWorkout();
+          if (doneRow.day_type && doneRow.day_type.startsWith('hall:')) {
+            try { await markDone(doneRow.day_type.slice(5), doneRow.id); } catch (e) { /* o treino já está salvo */ }
+          }
           stopRest(); close(); ctx = null;
           toast(t('session.finished'), 'trophy');
           location.hash = '#hoje';

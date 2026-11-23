@@ -8,6 +8,8 @@ import pt4 from './pt4.js';
 import en4 from './en4.js';
 import pt5 from './pt5.js';
 import en5 from './en5.js';
+import pt6 from './pt6.js';
+import en6 from './en6.js';
 
 function merge(...parts) {
   const out = {};
@@ -19,7 +21,7 @@ function merge(...parts) {
   return out;
 }
 
-const DICTS = { pt: merge(pt1, pt2, pt3, pt4, pt5), en: merge(en1, en2, en3, en4, en5) };
+const DICTS = { pt: merge(pt1, pt2, pt3, pt4, pt5, pt6), en: merge(en1, en2, en3, en4, en5, en6) };
 let lang = 'pt';
 
 export function setLanguage(l) {

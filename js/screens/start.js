@@ -58,3 +58,8 @@ export async function quickStart() {
     }
   });
 }
+
+/** Começa o treino de um desafio do Hall da Fama como uma sessão normal. */
+export async function startChallenge(c) {
+  await startDay({ key: 'H', type: 'hall:' + c.id, exercises: c.exercises.map((x) => ({ ...x })) });
+}

@@ -8,6 +8,11 @@ import { dayForDate, nextTraining } from '../engine/generator.js';
 import { cycleWeek, weekStrip, exerciseList } from './plan.js';
 import { loadWorkouts, getOpen, doneToday, workoutsThisWeek, streak } from '../data/workouts.js';
 import { startDay } from './start.js';
+import { dayLabel } from '../data/labels.js';
+import { phraseOfDay } from '../data/phrases.js';
+import { hallState } from './hall.js';
+import { startChallenge } from './start.js';
+import { getRecent } from '../data/workouts.js';
 import { formatDuration } from '../utils/units.js';
 import { cycleCard } from './dashboard.js';
 import { cycleInfo } from '../data/stats.js';
@@ -36,6 +41,10 @@ export default {
     const open = row ? getOpen() : null;
     const finished = row ? doneToday() : null;
 
+    let hall = null;
+    if (row) { try { hall = await hallState(); } catch (e) { hall = null; } }
+    const hallToday = hall && hall.current && hall.pl && !hall.doneThisWeek && new Date().toDateString() === hall.pl.date.toDateString();
+
     let workoutCard;
     let cycleKpi = kpi(t('today.kpiCycle'), '—', t('today.kpiCycleSub'));
 
@@ -60,7 +69,7 @@ export default {
           <div class="card">
             <div class="card-head">
               <div class="card-title"><span class="day-badge day-${esc(open.day_key)}">${esc(open.day_key)}</span>
-                <div><span class="eyebrow">${esc(t('session.inProgress'))}</span><h2>${esc(t('dayTypes.' + open.day_type))}</h2></div></div>
+                <div><span class="eyebrow">${esc(t('session.inProgress'))}</span><h2>${esc(dayLabel(open.day_type))}</h2></div></div>
             </div>
             <p class="muted">${esc(t('session.inProgressText', { n: open.sets.filter((x) => x.done).length }))}</p>
             <a class="btn btn-primary btn-block" href="#treino" style="margin-top:14px">${icon('dumbbell')}${esc(t('session.continue'))}</a>
@@ -98,6 +107,37 @@ export default {
       }
     }
 
+    let context = 'g';
+    if (row) {
+      const todayDay = dayForDate(row.data);
+      const recent = getRecent();
+      const last = recent[0] ? new Date(recent[0].started_at) : null;
+      const st = streak(row.data.schedule);
+      if (finished) context = 'done';
+      else if (hallToday) context = 'hall';
+      else if (last && Date.now() - last > 7 * 864e5) context = 'back';
+      else if (!todayDay) context = 'rest';
+      else if (st >= 3 && Math.random() < 0.4) context = 'streak';
+      else if (/legs|lower/.test(todayDay.type)) context = 'legs';
+      else if (!/full|conditioning/.test(todayDay.type)) context = 'upper';
+    }
+    const phrase = phraseOfDay(context, lang);
+
+    const hallCard = hall && hall.current && !hall.doneThisWeek ? `
+      <div class="card hall-mini">
+        <div class="hall-row">
+          <div class="avatar cat-${esc(hall.current.category)}">${esc(hall.current.person.split(' ').map((p) => p[0]).slice(0, 2).join(''))}</div>
+          <div style="min-width:0;flex:1">
+            <span class="eyebrow">${esc(hall.mode === 'monthly' ? t('hall.monthly') : t('hall.weekly'))}</span>
+            <h3>${esc(hall.current.person)}: ${esc(hall.current.title[lang] || hall.current.title.pt)}</h3>
+          </div>
+        </div>
+        <div class="hall-actions">
+          ${hallToday ? `<button type="button" class="btn btn-primary btn-sm" data-hall-start>${icon('trophy')}${esc(t('hall.start'))}</button>` : ''}
+          <a class="btn btn-sm" href="#hall-${esc(hall.current.id)}">${esc(t('hall.details'))}</a>
+        </div>
+      </div>` : '';
+
     el.innerHTML = `
       <section class="screen">
         <header class="hero">
@@ -116,13 +156,15 @@ export default {
 
         ${workoutCard}
 
+        ${hallCard}
+
         <div class="grid grid-2">
           <div class="card">
             <div class="card-head"><span class="eyebrow">${esc(t('today.quoteTitle'))}</span></div>
             <div class="quote">
               <div class="quote-mark">${icon('quote')}</div>
               <div>
-                <p class="quote-text">${esc(t('today.quote'))}</p>
+                <p class="quote-text">${esc(phrase)}</p>
                 <p class="quote-author">${esc(t('today.quoteAuthor'))}</p>
               </div>
             </div>
@@ -146,5 +188,7 @@ export default {
 
     const start = el.querySelector('[data-start]');
     if (start) start.addEventListener('click', () => startDay(dayForDate(row.data)));
+    const hs = el.querySelector('[data-hall-start]');
+    if (hs) hs.addEventListener('click', () => startChallenge(hall.current));
   }
 };

@@ -1,6 +1,6 @@
 // Service worker: guarda os arquivos do app para abrir offline.
 // Ao publicar uma versão nova, altere VERSION para renovar o cache.
-const VERSION = 'apex-v0.5.2';
+const VERSION = 'apex-v0.6.0';
 const ASSETS = [
   './',
   './index.html',
@@ -55,6 +55,14 @@ const ASSETS = [
   './js/i18n/en5.js',
   './js/data/demo.js',
   './js/ui/demo-ui.js',
+  './js/data/challenges.js',
+  './js/data/hall.js',
+  './js/data/labels.js',
+  './js/data/phrases.js',
+  './js/engine/hall.js',
+  './js/screens/hall.js',
+  './js/i18n/pt6.js',
+  './js/i18n/en6.js',
   './data/exercises.json',
   './icons/icon.svg',
   './icons/icon-192.png',
