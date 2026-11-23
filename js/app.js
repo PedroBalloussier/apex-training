@@ -216,7 +216,16 @@ async function init() {
 
   // PWA: só onde o navegador permite (GitHub Pages); ignorado em ambientes restritos
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+    try {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+      // Quando uma versão nova assume, recarrega uma vez para usar os arquivos novos
+      let reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloaded || !navigator.serviceWorker.controller) return;
+        reloaded = true;
+        if (!document.querySelector('.sheet') && !location.hash.startsWith('#treino')) location.reload();
+      });
+    } catch (e) {}
   }
 }
 
