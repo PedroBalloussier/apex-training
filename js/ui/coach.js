@@ -247,11 +247,12 @@ export function coachTip(key, { delay = 600 } = {}) {
 }
 
 /** Chamado depois de cada tela: boas-vindas na primeira vez; tour depois do primeiro plano. */
-const SKIP_ROUTES = new Set(['triage', 'session', 'profile', 'invite']);
+const SKIP_ROUTES = new Set(['session', 'profile', 'invite']);
 let pending = null;
 export function coachAuto(routeId) {
   if (active || pending || SKIP_ROUTES.has(routeId)) return;
-  const want = !coachSeen('welcome') ? 'welcome' : (getActivePlan() && !coachSeen('tour') ? 'tour' : null);
+  // Na triagem só cabe a boas-vindas (antes do primeiro plano); o tour espera o plano ficar pronto.
+  const want = !coachSeen('welcome') ? 'welcome' : (routeId !== 'triage' && getActivePlan() && !coachSeen('tour') ? 'tour' : null);
   if (!want) return;
   pending = setTimeout(() => {
     pending = null;
