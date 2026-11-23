@@ -10,6 +10,8 @@ import { loadCatalog, getExercise, exerciseName } from '../data/catalog.js';
 import { formatDuration } from '../utils/units.js';
 import { openSheet } from '../ui/feedback.js';
 import triage from './triage.js';
+import { diffBadge } from '../ui/difficulty.js';
+import { difficultyOf } from '../engine/difficulty.js';
 
 let selectedKey = null;
 
@@ -121,6 +123,7 @@ export default {
             <div class="card-title"><span class="day-badge day-${day.key}">${day.key}</span><h2>${esc(t('dayTypes.' + day.type))}</h2></div>
             <span class="chip num">${esc(t('results.exercises', { n: day.exercises.length }))}</span>
           </div>
+          <div class="diff-row">${diffBadge(difficultyOf(day.exercises), { label: true })}</div>
           ${exerciseList(day, lang, { actions: true })}
           <button type="button" class="btn btn-primary btn-block" data-start style="margin-top:14px">${icon('dumbbell')}${esc(t('plan.startDay', { k: day.key }))}</button>
         </div>

@@ -1,7 +1,7 @@
 // Medidas corporais (Supabase).
 import { supabase } from './supabase.js';
 
-export const BODY_FIELDS = ['weight_kg', 'body_fat_pct', 'waist_cm', 'chest_cm', 'arm_cm', 'thigh_cm', 'hip_cm'];
+export const BODY_FIELDS = ['weight_kg', 'body_fat_pct', 'waist_cm', 'neck_cm', 'chest_cm', 'arm_cm', 'thigh_cm', 'hip_cm'];
 
 let cache = null;
 

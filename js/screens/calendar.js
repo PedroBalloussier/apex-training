@@ -66,14 +66,14 @@ export default {
       let state = 'rest', mark = '';
       if (ws) {
         state = 'done';
-        mark = `<span class="cal-dot day-${esc(ws[0].day_key)}">${esc(ws[0].day_key)}</span>`;
+        mark = `<span class="cal-mark"><span class="cal-dot day-${esc(ws[0].day_key)}">${esc(ws[0].day_key)}</span><span class="cal-check">${icon('check')}</span></span>`;
       } else if (sched) {
         state = past ? 'missed' : 'planned';
         mark = `<span class="cal-dot ${past ? 'missed' : 'planned'} ${past ? '' : 'ring-' + sched.key}">${esc(sched.key)}</span>`;
       }
       if (sched && (past || isToday)) { if (past) scheduledPast++; if (ws) donePlanned++; }
       cells.push(`<button type="button" class="cal-cell ${state} ${isToday ? 'today' : ''}" data-date="${date.toISOString()}" aria-label="${esc(String(d))}">
-        <span class="cal-num num">${d}</span>${mark}${ws ? `<span class="cal-check">${icon('check')}</span>` : ''}</button>`);
+        <span class="cal-num num">${d}</span>${mark}</button>`);
     }
 
     const total = done.length;

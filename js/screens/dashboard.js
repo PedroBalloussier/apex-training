@@ -9,6 +9,7 @@ import { loadBody } from '../data/body.js';
 import { setsSince, workoutsSince, cycleInfo, buildReport, perExerciseSessions, setsByMuscle, weeklyCounts, dayKey } from '../data/stats.js';
 import { formatWeight, weightToUser } from '../utils/units.js';
 import { lineChart, weekBars, hBars, heatmap } from '../ui/charts.js';
+import { dayForDate } from '../engine/generator.js';
 
 let selectedEx = null;
 
@@ -52,12 +53,33 @@ export default {
     const cycleWorkouts = workouts.filter((w) => new Date(w.started_at) >= info.start);
     const report = buildReport(row, cycleWorkouts, cycleSets, body);
 
-    // Heatmap: séries por dia nas últimas 16 semanas
+    // Heatmap: % da sessão planejada cumprida por dia, Hall em dourado, faltas com contorno.
+    const doneByWorkout = new Map();
+    for (const st of sets) doneByWorkout.set(st.workout_id, (doneByWorkout.get(st.workout_id) || 0) + 1);
     const perDay = new Map();
-    for (const s of sets) { const k = dayKey(s.created_at); perDay.set(k, (perDay.get(k) || 0) + 1); }
-    for (const w of workouts) { const k = dayKey(w.started_at); if (!perDay.has(k)) perDay.set(k, 1); }
+    for (const w of workouts) {
+      const k = dayKey(w.started_at);
+      const planned = (w.exercises || []).reduce((n, x) => n + (Number(x.sets) || 0), 0);
+      const done = doneByWorkout.get(w.id) || 0;
+      const cur = perDay.get(k) || { planned: 0, done: 0, hall: false };
+      cur.planned += planned; cur.done += done;
+      if (String(w.day_type).startsWith('hall:')) cur.hall = true;
+      perDay.set(k, cur);
+    }
+    const cells = new Map();
+    for (const [k, v] of perDay) {
+      const pct = v.planned ? Math.min(1, v.done / v.planned) : 1;
+      const level = pct >= 0.999 ? 4 : pct >= 0.7 ? 3 : pct >= 0.4 ? 2 : 1;
+      cells.set(k, { level, hall: v.hall, tip: v.hall ? t('heat.hall') : `${Math.round(pct * 100)}%` });
+    }
+    // Faltas: dias de treino do plano ativo, do início do ciclo até ontem, sem sessão.
+    const yesterday = new Date(); yesterday.setHours(0, 0, 0, 0); yesterday.setDate(yesterday.getDate() - 1);
+    for (let d = new Date(info.start); d <= yesterday; d.setDate(d.getDate() + 1)) {
+      const k = dayKey(d);
+      if (!cells.has(k) && dayForDate(row.data, d)) cells.set(k, { level: 0, missed: true, tip: t('heat.missed') });
+    }
     const wdNames = tl('weekdays');
-    const hm = heatmap(perDay, 16, dayKey, [1, 2, 3, 4, 5, 6, 0].map((d) => wdNames[d]));
+    const hm = heatmap(cells, 16, dayKey, [1, 2, 3, 4, 5, 6, 0].map((d) => wdNames[d]));
 
     // Meta semanal
     const weeks = weeklyCounts(workouts, 8).map((w) => ({ label: new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }).format(w.start), value: w.value }));
@@ -97,7 +119,9 @@ export default {
         <div class="card">
           <div class="card-head"><span class="eyebrow">${esc(t('dash.consistency'))}</span><span class="chip">${esc(t('dash.weeks16'))}</span></div>
           ${hm}
-          <div class="hm-legend"><span>${esc(t('dash.less'))}</span><i class="hm l0"></i><i class="hm l1"></i><i class="hm l2"></i><i class="hm l3"></i><i class="hm l4"></i><span>${esc(t('dash.more'))}</span></div>
+          <div class="hm-legend"><span>${esc(t('dash.less'))}</span><i class="hm l0"></i><i class="hm l1"></i><i class="hm l2"></i><i class="hm l3"></i><i class="hm l4"></i><span>${esc(t('dash.more'))}</span>
+            <span class="lg-sep"></span><i class="hm hall"></i><span>${esc(t('heat.hall'))}</span><span class="lg-sep"></span><i class="hm miss"></i><span>${esc(t('heat.missed'))}</span></div>
+          <p class="setting-hint hm-hint">${esc(t('heat.hint'))}</p>
         </div>
 
         <div class="grid grid-2">

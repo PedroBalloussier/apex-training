@@ -137,9 +137,10 @@ export default {
         <div class="kpi"><span class="kpi-label">${esc(t('exercise.last'))}</span><span class="kpi-value num">${esc(fmtDate(sessions[0].date, lang))}</span></div>
       </div>
       ${sparkline(chrono, unit)}
+      <details class="hist-more" data-collapse="ex-hist"><summary>${icon('chevron')}<span>${esc(t('exercise.sessions', { n: sessions.length }))}</span></summary>
       <ul class="hist-list">${sessions.slice(0, 8).map((s) => `
         <li><span class="hist-date">${esc(fmtDate(s.date, lang))}</span>
           <span class="hist-sets num">${esc(s.sets.map((x) => `${x.weight_kg != null ? weightToUser(Number(x.weight_kg), unit) : '—'}×${x.reps ?? '—'}${x.to_failure ? 'F' : ''}`).join('  ·  '))}</span></li>`).join('')}
-      </ul>`;
+      </ul></details>`;
   }
 };

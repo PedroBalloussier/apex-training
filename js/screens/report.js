@@ -7,9 +7,12 @@ import { getSettings } from '../data/settings.js';
 import { getActivePlan, getPlan, listPlans, getProfile } from '../data/account.js';
 import { loadCatalog, exerciseName } from '../data/catalog.js';
 import { loadBody } from '../data/body.js';
-import { setsSince, workoutsSince, buildReport, weeklyCounts } from '../data/stats.js';
+import { setsSince, workoutsSince, buildReport, perExerciseSessions } from '../data/stats.js';
 import { formatWeight, formatLength } from '../utils/units.js';
 import triage from './triage.js';
+import { lineChart, weekBars } from '../ui/charts.js';
+import { deriveRows } from '../data/bodymetrics.js';
+import { weightToUser } from '../utils/units.js';
 
 const DAY = 864e5;
 
@@ -59,9 +62,10 @@ async function shareImage(r, lang, unit, hl) {
   const font = (w, s) => `${w} ${s}px -apple-system, "Segoe UI", Inter, Roboto, sans-serif`;
   const grad = g.createLinearGradient(80, 0, 400, 0); grad.addColorStop(0, '#14B8A6'); grad.addColorStop(1, '#34D399');
   // Marca
-  g.fillStyle = grad; g.beginPath(); g.roundRect(80, 80, 72, 72, 20); g.fill();
-  g.strokeStyle = '#04211E'; g.lineWidth = 8; g.lineCap = 'round'; g.lineJoin = 'round';
-  g.beginPath(); g.moveTo(98, 136); g.lineTo(116, 96); g.lineTo(134, 136); g.moveTo(105, 122); g.lineTo(127, 122); g.stroke();
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'icons/icon-192.png'; });
+    g.save(); g.beginPath(); g.roundRect(80, 80, 72, 72, 20); g.clip(); g.drawImage(img, 80, 80, 72, 72); g.restore();
+  } catch (e) { g.fillStyle = grad; g.beginPath(); g.roundRect(80, 80, 72, 72, 20); g.fill(); }
   g.fillStyle = '#F8FAFC'; g.font = font(700, 40); g.fillText('Apex', 172, 130);
   // Título
   g.fillStyle = '#7A8798'; g.font = font(600, 28); g.fillText(t('report.eyebrow').toUpperCase(), 80, 250);
@@ -116,6 +120,67 @@ async function shareImage(r, lang, unit, hl) {
   toast(t('report.imageSaved'));
 }
 
+const numFmt = (v, lang, d = 1) => Number(v).toLocaleString(lang === 'en' ? 'en-US' : 'pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+const shortDate = (d, lang) => new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: 'short' }).format(new Date(d));
+
+/** Treinos por semana do ciclo (semana 1 = semana do início). */
+function cycleWeeks(workouts, from, to) {
+  const out = [];
+  const start = new Date(from); start.setHours(0, 0, 0, 0);
+  for (let a = new Date(start), i = 1; a <= to && i <= 16; i++) {
+    const b = new Date(a); b.setDate(a.getDate() + 7);
+    out.push({ label: t('report.weekShort', { n: i }), value: workouts.filter((w) => { const d = new Date(w.started_at); return d >= a && d < b; }).length });
+    a = b;
+  }
+  return out;
+}
+
+/** Seção do corpo no ciclo: tabela início/fim e gráfico do peso com massa magra e gorda. */
+function bodySection(body, profile, from, to, s, lang) {
+  const lo = new Date(from.getTime() - 7 * DAY), hi = new Date(to.getTime() + DAY);
+  const all = deriveRows(body, profile);
+  const rows = all.filter((d) => { const x = new Date(d.date + 'T12:00:00'); return x >= lo && x <= hi; });
+  const metrics = [
+    ['weight_kg', (d) => d.weight, (v) => formatWeight(v, s.weightUnit, lang)],
+    ['bmi', (d) => d.bmi, (v) => numFmt(v, lang)],
+    ['fat', (d) => d.fat, (v) => `${numFmt(v, lang)}%`],
+    ['lean', (d) => d.lean, (v) => formatWeight(v, s.weightUnit, lang)],
+    ['fatMass', (d) => d.fatMass, (v) => formatWeight(v, s.weightUnit, lang)],
+    ['whtr', (d) => d.whtr, (v) => numFmt(v, lang, 2)],
+    ...['waist_cm', 'hip_cm', 'chest_cm', 'arm_cm', 'thigh_cm', 'neck_cm'].map((f) => [f, (d) => (d.raw[f] != null ? Number(d.raw[f]) : null), (v) => formatLength(v, s.lengthUnit, lang)])
+  ];
+  const lines = metrics.map(([k, get, fmt]) => {
+    const list = rows.filter((d) => get(d) != null);
+    if (list.length < 2) return '';
+    const a = get(list[0]), b = get(list[list.length - 1]);
+    const d = b - a;
+    const delta = Math.abs(d) < 0.005 ? '—' : (d > 0 ? '+' : '−') + fmt(Math.abs(d));
+    return `<tr><td>${esc(t('body.' + k))}</td><td class="num">${esc(fmt(a))}</td><td class="num">${esc(fmt(b))}</td><td class="num">${esc(delta)}</td></tr>`;
+  }).filter(Boolean);
+  if (!lines.length) return '';
+  const chart = (get, color, height = 160, conv = (v) => weightToUser(v, s.weightUnit)) => {
+    const list = rows.filter((d) => get(d) != null);
+    if (list.length < 2) return '';
+    return lineChart(list.map((d) => ({ label: shortDate(d.date + 'T12:00:00', lang), value: conv(get(d)) })),
+      { color, height, labels: height > 130, format: (v) => `${numFmt(v, lang)} ${s.weightUnit}` });
+  };
+  const w = chart((d) => d.weight, 'var(--primary)');
+  const lean = chart((d) => d.lean, '#38BDF8', 120);
+  const fatM = chart((d) => d.fatMass, '#FBBF24', 120);
+  return `
+    <div class="card report-body">
+      <div class="card-head"><div class="card-title">${icon('scale')}<h2>${esc(t('report.bodyCycle'))}</h2></div></div>
+      <div class="table-wrap"><table class="rtable">
+        <thead><tr><th></th><th>${esc(t('report.bodyStart'))}</th><th>${esc(t('report.bodyEnd'))}</th><th>${esc(t('report.bodyChange'))}</th></tr></thead>
+        <tbody>${lines.join('')}</tbody></table></div>
+      ${w ? `<div class="chart-sub" style="margin-top:14px">${esc(t('report.weightComp'))}</div>${w}` : ''}
+      ${lean || fatM ? `<div class="comp-grid">
+        ${lean ? `<div class="comp-mini"><div class="comp-mini-head"><span>${esc(t('body.lean'))}</span></div>${lean}</div>` : ''}
+        ${fatM ? `<div class="comp-mini"><div class="comp-mini-head"><span>${esc(t('body.fatMass'))}</span></div>${fatM}</div>` : ''}
+      </div>` : ''}
+    </div>`;
+}
+
 export default {
   async render(el, planId) {
     const lang = getLanguage();
@@ -137,7 +202,9 @@ export default {
     const r = buildReport(row, planWorkouts, planSets, body);
     const hl = highlights(r, lang, unit);
     const name = getProfile()?.name?.split(' ')[0] || '';
-    const weeks = weeklyCounts(planWorkouts, Math.min(12, r.info.weeks));
+    const topLifts = [...perExerciseSessions(planSets)].filter(([, sess]) => sess.length >= 3 && sess.some((x) => x.best > 0))
+      .sort((a, b) => b[1].length - a[1].length).slice(0, 4);
+    const bodyHtml = bodySection(body, getProfile() || {}, r.from, r.to, s, lang);
     const past = plans.filter((p) => p.id !== row.id && p.status === 'archived');
 
     el.innerHTML = `
@@ -172,19 +239,19 @@ export default {
             : `<p class="muted">${esc(t('report.noStrength'))}</p>`}
         </div>
 
-        <div class="grid grid-2">
-          <div class="card">
-            <div class="card-head"><span class="eyebrow">${esc(t('report.body'))}</span></div>
-            ${Object.keys(r.bodyChanges).length ? `<ul class="hist-list">${Object.entries(r.bodyChanges).map(([f, c]) => `
-              <li><span class="hist-date">${esc(t('body.' + f))}</span><span class="hist-sets num">${esc(bodyText(f, c, s, lang))}</span></li>`).join('')}</ul>`
-              : `<p class="muted">${esc(t('report.noBody'))}</p><a class="btn btn-sm" href="#corpo" style="margin-top:10px">${icon('plus')}${esc(t('body.add'))}</a>`}
-          </div>
-          <div class="card">
-            <div class="card-head"><span class="eyebrow">${esc(t('report.weekly'))}</span></div>
-            <div class="week-mini">${weeks.map((w) => `<span class="${w.value >= r.plan.daysPerWeek ? 'hit' : w.value ? 'part' : ''}" title="${w.value}">${w.value}</span>`).join('')}</div>
-            <p class="setting-hint">${esc(t('dash.goalLine', { n: r.plan.daysPerWeek }))}</p>
-          </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">${icon('chart')}<h2>${esc(t('report.charts'))}</h2></div></div>
+          <div class="chart-sub">${esc(t('report.weekly'))}</div>
+          ${weekBars(cycleWeeks(planWorkouts, r.from, r.to), r.plan.daysPerWeek)}
+          <p class="setting-hint">${esc(t('dash.goalLine', { n: r.plan.daysPerWeek }))}</p>
+          ${topLifts.length ? `<div class="chart-sub" style="margin-top:16px">${esc(t('report.topLifts'))}</div>
+            <p class="setting-hint">${esc(t('report.topLiftsHint'))}</p>
+            <div class="lift-grid">${topLifts.map(([id, sess]) => `<div class="comp-mini"><div class="comp-mini-head"><a class="ex-link" href="#ex-${esc(id)}">${esc(exerciseName(id, lang))}</a></div>
+              ${lineChart(sess.map((x) => ({ label: shortDate(x.date, lang), value: weightToUser(x.best, unit) })), { height: 120, labels: false, format: (v) => `${numFmt(v, lang)} ${unit}` })}</div>`).join('')}</div>` : ''}
         </div>
+
+        ${bodyHtml || `<div class="card"><div class="card-head"><span class="eyebrow">${esc(t('report.body'))}</span></div>
+          <p class="muted">${esc(t('report.noBody'))}</p><a class="btn btn-sm" href="#corpo" style="margin-top:10px">${icon('plus')}${esc(t('body.add'))}</a></div>`}
 
         <div class="report-actions no-print">
           <button type="button" class="btn" data-share>${icon('upload')}${esc(t('report.shareImage'))}</button>

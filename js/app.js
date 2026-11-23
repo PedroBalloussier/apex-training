@@ -72,7 +72,7 @@ function renderShell() {
   app.innerHTML = `
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark">${icon('logo')}</div>
+        <img class="brand-img" src="icons/icon-192.png" alt="" width="30" height="30">
         <span class="brand-name">${esc(t('app.name'))}</span>
         <span class="badge-version num">${esc(t('app.version'))}</span>
       </div>

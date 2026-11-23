@@ -13,12 +13,13 @@ export function renderAuth(root) {
     <div class="auth-wrap">
       <div class="auth-card">
         <div class="auth-brand">
-          <div class="brand"><div class="brand-mark">${icon('logo')}</div><span class="brand-name">${esc(t('app.name'))}</span></div>
+          <div class="brand"><img class="brand-img" src="icons/icon-192.png" alt="" width="30" height="30"><span class="brand-name">${esc(t('app.name'))}</span></div>
           <div class="seg" role="group" aria-label="${esc(t('settings.language'))}">
             <button type="button" data-lang="pt" aria-pressed="${s.language === 'pt'}">PT</button>
             <button type="button" data-lang="en" aria-pressed="${s.language === 'en'}">EN</button>
           </div>
         </div>
+        <img class="auth-coach" src="icons/coach.jpg" alt="${esc(t('coach.name'))}" width="720" height="720">
         <div class="auth-head">
           <h1>${esc(t('auth.title'))}</h1>
           <p class="muted">${esc(t('auth.subtitle'))}</p>

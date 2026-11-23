@@ -48,6 +48,11 @@ function simulateCycle({ planId, plan, startedDaysAgo, endDaysAgo, skipRate, wee
       }
       if (r && (allTop || rnd() < 0.35)) st.top = true;
     });
+    // Algumas sessões ficam incompletas (faltou tempo): cortam os últimos exercícios.
+    if (rnd() < 0.22) {
+      const cut = day.exercises.length - 1 - Math.floor(rnd() * Math.min(3, day.exercises.length - 1));
+      for (let i = sets.length - 1; i >= 0; i--) if (sets[i].p >= cut) sets.splice(i, 1);
+    }
     const hh = 17 + Math.floor(rnd() * 3), mm = Math.floor(rnd() * 4) * 15;
     workouts.push({
       id: `w-${planId}-${daysAgo}`, planId, dayKey: day.key, dayType: day.type,
@@ -71,7 +76,7 @@ simulateCycle({ planId: 'demo-cur', plan: cur, startedDaysAgo: CUR_START, endDay
 workouts.sort((a, b) => b.daysAgo - a.daysAgo);
 
 const body = [];
-for (let daysAgo = PREV_START; daysAgo >= 1; daysAgo -= 14) {
+for (let daysAgo = PREV_START; daysAgo >= 1; daysAgo -= 7) {
   const t = 1 - daysAgo / PREV_START; // 0 -> 1 ao longo do tempo
   body.push({
     daysAgo,
@@ -80,8 +85,12 @@ for (let daysAgo = PREV_START; daysAgo >= 1; daysAgo -= 14) {
     waist_cm: Math.round((91 - 6 * t) * 10) / 10,
     arm_cm: Math.round((35 + 1.8 * t) * 10) / 10,
     chest_cm: Math.round((101 + 2 * t) * 10) / 10,
-    thigh_cm: Math.round((57 + 1.5 * t) * 10) / 10
+    thigh_cm: Math.round((57 + 1.5 * t) * 10) / 10,
+    neck_cm: Math.round((38.6 + 0.6 * t) * 10) / 10,
+    hip_cm: Math.round((99 - 2.5 * t) * 10) / 10
   });
+  // % de gordura registrada só a cada 4 semanas; nos outros dias o app estima pelas medidas
+  if (Math.round(daysAgo / 7) % 4 !== 0) delete body[body.length - 1].body_fat_pct;
 }
 
 const file = {

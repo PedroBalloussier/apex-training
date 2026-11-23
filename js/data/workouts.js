@@ -165,7 +165,7 @@ export async function exerciseHistory(exerciseId) {
 
 /** Treinos concluídos num intervalo de datas. */
 export async function workoutsBetween(start, end) {
-  const { data } = await supabase.from('workouts').select('id, plan_id, day_key, day_type, status, started_at, finished_at, duration_sec')
+  const { data } = await supabase.from('workouts').select('id, plan_id, day_key, day_type, status, started_at, finished_at, duration_sec, exercises')
     .eq('status', 'done').gte('started_at', start.toISOString()).lt('started_at', end.toISOString())
     .order('started_at', { ascending: true }).limit(200);
   return data || [];

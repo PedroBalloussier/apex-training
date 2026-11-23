@@ -8,7 +8,7 @@ const ex = (id, sets, reps, restSec, more = {}) => ({ id, sets, reps, restSec, .
 
 export const CHALLENGES = [
   {
-    id: 'bruce-lee-1965', person: 'Bruce Lee', category: 'fight', kind: 'replace', level: 2,
+    id: 'bruce-lee-1965', person: 'Bruce Lee', category: 'fight', kind: 'replace', level: 2, difficulty: 3,
     focus: ['biceps', 'triceps', 'forearms'],
     title: { pt: 'A ficha de 1965', en: 'The 1965 card' },
     who: {
@@ -43,7 +43,7 @@ export const CHALLENGES = [
     source: null
   },
   {
-    id: 'arnold-golden-six', person: 'Arnold Schwarzenegger', category: 'bodybuilding', kind: 'extra', level: 1,
+    id: 'arnold-golden-six', person: 'Arnold Schwarzenegger', category: 'bodybuilding', kind: 'extra', level: 1, difficulty: 2,
     focus: ['quads', 'chest', 'back', 'shoulders', 'biceps', 'core'],
     title: { pt: 'Golden Six', en: 'Golden Six' },
     who: {
@@ -69,7 +69,7 @@ export const CHALLENGES = [
     source: 'https://liftvault.com/programs/bodybuilding/arnold-schwarzenegger-workout-routine-golden-six/'
   },
   {
-    id: 'arnold-chest-back', person: 'Arnold Schwarzenegger', category: 'bodybuilding', kind: 'replace', level: 3,
+    id: 'arnold-chest-back', person: 'Arnold Schwarzenegger', category: 'bodybuilding', kind: 'replace', level: 3, difficulty: 5,
     focus: ['chest', 'back'],
     title: { pt: 'Peito e costas da Era de Ouro', en: 'Golden Era chest and back' },
     who: {
@@ -97,7 +97,7 @@ export const CHALLENGES = [
     source: 'https://www.t3.com/news/arnold-schwarzenegger-shares-his-golden-era-chest-and-back-workout-and-its-insane'
   },
   {
-    id: 'steve-reeves-full', person: 'Steve Reeves', category: 'legends', kind: 'extra', level: 2,
+    id: 'steve-reeves-full', person: 'Steve Reeves', category: 'legends', kind: 'extra', level: 2, difficulty: 3,
     focus: ['shoulders', 'chest', 'back', 'biceps', 'triceps', 'quads', 'hamstrings', 'calves'],
     title: { pt: 'Full body clássico', en: 'Classic full body' },
     who: {
@@ -127,7 +127,7 @@ export const CHALLENGES = [
     source: 'https://fitnessvolt.com/steve-reeves-workout/'
   },
   {
-    id: 'tyson-calisthenics', person: 'Mike Tyson', category: 'fight', kind: 'extra', level: 2,
+    id: 'tyson-calisthenics', person: 'Mike Tyson', category: 'fight', kind: 'extra', level: 2, difficulty: 4,
     focus: ['core', 'triceps', 'chest', 'quads'],
     title: { pt: 'Calistenia do Iron Mike', en: 'Iron Mike calisthenics' },
     who: {
@@ -152,7 +152,7 @@ export const CHALLENGES = [
     source: 'https://www.sportskeeda.com/mma/news-mike-tyson-calisthenics-what-legendary-boxer-s-workout-routine-include'
   },
   {
-    id: 'herschel-walker-bodyweight', person: 'Herschel Walker', category: 'athletes', kind: 'extra', level: 1,
+    id: 'herschel-walker-bodyweight', person: 'Herschel Walker', category: 'athletes', kind: 'extra', level: 1, difficulty: 4,
     focus: ['chest', 'core', 'back'],
     title: { pt: 'Flexões, abdominais e barra', en: 'Push-ups, sit-ups and pull-ups' },
     who: {
@@ -176,7 +176,7 @@ export const CHALLENGES = [
     source: 'https://www.nfl.com/news/football-fit-a-look-at-herschel-walker-s-workout-routine-0ap3000000537126'
   },
   {
-    id: 'lalanne-1959', person: 'Jack LaLanne', category: 'legends', kind: 'extra', level: 2,
+    id: 'lalanne-1959', person: 'Jack LaLanne', category: 'legends', kind: 'extra', level: 2, difficulty: 3,
     focus: ['back', 'biceps', 'fullbody'],
     title: { pt: 'Desafio de 1959', en: 'The 1959 challenge' },
     who: {
@@ -199,7 +199,7 @@ export const CHALLENGES = [
     source: 'https://jacklalanne.com/?p=86'
   },
   {
-    id: 'jackman-wolverine', person: 'Hugh Jackman', category: 'film', kind: 'extra', level: 3,
+    id: 'jackman-wolverine', person: 'Hugh Jackman', category: 'film', kind: 'extra', level: 3, difficulty: 4,
     focus: ['chest', 'back', 'quads', 'hamstrings'],
     title: { pt: 'Força do Wolverine', en: 'Wolverine strength' },
     who: {
@@ -224,7 +224,7 @@ export const CHALLENGES = [
     source: 'https://coachweb.com/exercises/celebrity-workouts/146/exclusive-hugh-jackman-wolverine-workout'
   },
   {
-    id: 'ramon-dino-back', person: 'Ramon Dino', category: 'bodybuilding', kind: 'replace', level: 2,
+    id: 'ramon-dino-back', person: 'Ramon Dino', category: 'bodybuilding', kind: 'replace', level: 2, difficulty: 4,
     focus: ['back', 'shoulders'],
     title: { pt: 'V-taper do Dino', en: "Dino's V-taper" },
     who: {
@@ -250,7 +250,7 @@ export const CHALLENGES = [
     source: 'https://en.wikipedia.org/wiki/Ramon_Dino'
   },
   {
-    id: 'ronnie-coleman-back', person: 'Ronnie Coleman', category: 'bodybuilding', kind: 'replace', level: 3,
+    id: 'ronnie-coleman-back', person: 'Ronnie Coleman', category: 'bodybuilding', kind: 'replace', level: 3, difficulty: 5,
     focus: ['back', 'biceps'],
     title: { pt: 'Light weight, baby!', en: 'Light weight, baby!' },
     who: {
@@ -276,7 +276,7 @@ export const CHALLENGES = [
     source: null
   },
   {
-    id: 'rebeca-andrade-gym', person: 'Rebeca Andrade', category: 'athletes', kind: 'extra', level: 2,
+    id: 'rebeca-andrade-gym', person: 'Rebeca Andrade', category: 'athletes', kind: 'extra', level: 2, difficulty: 3, sourceType: 'inspired',
     focus: ['core', 'shoulders', 'quads'],
     title: { pt: 'Força de ginasta', en: 'Gymnast strength' },
     who: {
@@ -300,6 +300,264 @@ export const CHALLENGES = [
       ex('dead_bug', 3, '12', 45, { group: 'c1' })
     ],
     source: 'https://olympics.com/en/news/rebeca-andrade-floor-gold-medal-earned-history-brazil-bows-simone-biles-jordan-chiles'
+  },
+  {
+    id: 'chris-evans-legs', person: 'Chris Evans', category: 'film', kind: 'replace', level: 2, difficulty: 3,
+    focus: ['quads', 'hamstrings', 'glutes', 'calves'],
+    title: { pt: 'Pernas do Capitão América', en: "Captain America's legs" },
+    who: {
+      pt: 'Ator americano que interpretou o Capitão América em dez filmes da Marvel, de 2011 a 2019.',
+      en: 'American actor who played Captain America in ten Marvel films, from 2011 to 2019.'
+    },
+    why: {
+      pt: 'O treinador Simon Waterson buscava um físico atlético, não só estético, para Evans fazer boa parte das próprias cenas de ação.',
+      en: 'Trainer Simon Waterson aimed for an athletic physique, not just a look, so Evans could do most of his own stunts.'
+    },
+    fact: {
+      pt: 'Este é o treino de pernas que Evans usou para "Capitão América: O Primeiro Vingador", com cargas altas e poucas repetições, mantendo o coração acelerado.',
+      en: 'This is the leg routine Evans used for "Captain America: The First Avenger": heavy loads, low reps and a high heart rate.'
+    },
+    exercises: [
+      ex('bb_back_squat', 3, '6-8', 120),
+      ex('bb_lunge', 3, '6-8', 90),
+      ex('leg_press', 3, '6-8', 90),
+      ex('seated_calf_raise', 3, '6-8', 60),
+      ex('lying_leg_curl', 3, '6-8', 60)
+    ],
+    source: 'https://www.coachweb.com/leg-workouts/1932/captain-america-s-heroic-legs-workout'
+  },
+  {
+    id: 'goggins-boats', person: 'David Goggins', category: 'athletes', kind: 'extra', level: 2, difficulty: 5, sourceType: 'inspired',
+    focus: ['back', 'biceps', 'chest'],
+    title: { pt: 'Quem vai carregar os barcos?', en: "Who's gonna carry the boats?" },
+    who: {
+      pt: 'Ex-Navy SEAL, ultramaratonista e autor de "Can\'t Hurt Me". Ficou famoso pela disciplina extrema e pelos desafios que cria.',
+      en: 'Former Navy SEAL, ultramarathoner and author of "Can\'t Hurt Me". Known for extreme discipline and the challenges he creates.'
+    },
+    why: {
+      pt: 'Em 2013 bateu o recorde do Guinness de barras em 24 horas: 4.030 repetições em 17 horas, na terceira tentativa, depois de duas falhas.',
+      en: 'In 2013 he set the Guinness record for pull-ups in 24 hours: 4,030 reps in 17 hours, on his third attempt after two failures.'
+    },
+    fact: {
+      pt: 'Para o recorde ele treinava 400 barras por dia útil e 1.500 nos fins de semana. Aqui a meta é 100 barras somando as séries, com corrida no fim.',
+      en: 'For the record he trained 400 pull-ups each weekday and 1,500 on weekends. Here the goal is 100 pull-ups across all sets, then a run.'
+    },
+    note: { pt: 'Versão escalonada. Use barra assistida ou elástico se precisar: o que conta é não parar antes das 100.', en: 'Scaled version. Use an assisted bar or band if needed: what counts is not stopping before 100.' },
+    exercises: [
+      ex('pull_up', 10, 'falha', 90),
+      ex('push_up', 5, 'falha', 60),
+      ex('treadmill_run', 1, '30 min', 0)
+    ],
+    source: 'https://www.shortform.com/blog/david-goggins-pull-up/'
+  },
+  {
+    id: 'brie-larson-marvel', person: 'Brie Larson', category: 'film', kind: 'extra', level: 2, difficulty: 4,
+    focus: ['glutes', 'hamstrings', 'back', 'core'],
+    title: { pt: 'Força de Capitã Marvel', en: 'Captain Marvel strength' },
+    who: {
+      pt: 'Atriz vencedora do Oscar por "O Quarto de Jack" e protagonista de "Capitã Marvel" (2019), o primeiro filme da Marvel com uma heroína como protagonista.',
+      en: 'Oscar winner for "Room" and star of "Captain Marvel" (2019), the first Marvel film led by a female hero.'
+    },
+    why: {
+      pt: 'Treinou 9 meses com Jason Walsh. Começou sem conseguir fazer uma barra e terminou levantando 97 kg no terra e 181 kg no hip thrust.',
+      en: 'She trained for 9 months with Jason Walsh. She started unable to do a pull-up and finished deadlifting 97 kg and hip thrusting 181 kg.'
+    },
+    fact: {
+      pt: 'No fim da preparação ela empurrou o jipe do treinador ladeira acima. Walsh focava em compostos: agachamento, terra, hip thrust e trenó.',
+      en: "By the end of her prep she pushed her trainer's Jeep up a hill. Walsh focused on compound lifts: squats, deadlifts, hip thrusts and sled pushes."
+    },
+    exercises: [
+      ex('bb_hip_thrust', 4, '6-8', 120, { refKg: 181 }),
+      ex('bb_deadlift', 4, '5', 150, { refKg: 97 }),
+      ex('sled_push', 4, '20 m', 90),
+      ex('pull_up', 3, 'falha', 90),
+      ex('reverse_lunge', 3, '10', 60),
+      ex('ab_wheel', 3, '10', 60)
+    ],
+    source: 'https://www.hollywoodreporter.com/news/disney-brie-larson-trainer-share-captain-marvel-workout-fitness-app-1191910'
+  },
+  {
+    id: 'gal-gadot-legs', person: 'Gal Gadot', category: 'film', kind: 'replace', level: 1, difficulty: 2,
+    focus: ['quads', 'glutes', 'core'],
+    title: { pt: 'Pernas da Mulher-Maravilha', en: "Wonder Woman's legs" },
+    who: {
+      pt: 'Atriz israelense, Mulher-Maravilha nos filmes da DC desde 2016. Serviu dois anos no exército de Israel antes da carreira.',
+      en: 'Israeli actress, Wonder Woman in DC films since 2016. She served two years in the Israeli army before her career.'
+    },
+    why: {
+      pt: 'O treinador Magnus Lygdback chama o método de "beleza atlética": força, mobilidade e agilidade, uma hora por dia, cinco dias por semana.',
+      en: 'Trainer Magnus Lygdback calls his method "athletic beauty": strength, mobility and agility, one hour a day, five days a week.'
+    },
+    fact: {
+      pt: 'Este é o treino de pernas que Lygdback divulgou da preparação de "Mulher-Maravilha 1984": tiros na esteira, pernas e core.',
+      en: 'This is the leg workout Lygdback shared from the "Wonder Woman 1984" prep: treadmill sprints, legs and core.'
+    },
+    note: { pt: 'Afundo cruzado virou afundo reverso, caminhada lateral com elástico virou abdução com elástico e prancha oca virou prancha.', en: 'Curtsy lunge became reverse lunge, banded lateral walk became banded abduction and hollow hold became plank.' },
+    exercises: [
+      ex('treadmill_run', 1, '5 min', 0),
+      ex('treadmill_run', 3, '30 s', 30),
+      ex('goblet_squat', 3, '12', 60),
+      ex('walking_lunge', 3, '10', 60),
+      ex('reverse_lunge', 3, '10', 60),
+      ex('band_abduction', 3, '15', 45),
+      ex('plank', 3, '45 s', 45)
+    ],
+    source: 'https://www.yahoo.com/lifestyle/gal-gadot-worked-five-days-151100870.html'
+  },
+  {
+    id: 'scarlett-black-widow', person: 'Scarlett Johansson', category: 'film', kind: 'extra', level: 2, difficulty: 3, sourceType: 'inspired',
+    focus: ['hamstrings', 'shoulders', 'back', 'core'],
+    title: { pt: 'Circuito da Viúva Negra', en: 'Black Widow circuit' },
+    who: {
+      pt: 'Atriz americana que interpretou a Viúva Negra em nove filmes da Marvel, de "Homem de Ferro 2" (2010) ao filme solo de 2021.',
+      en: 'American actress who played Black Widow in nine Marvel films, from "Iron Man 2" (2010) to her 2021 solo film.'
+    },
+    why: {
+      pt: 'Disse que nunca tinha pisado numa academia antes do papel. O treinador Eric Johnson montou um treino de atleta: potência rotacional, força e condicionamento.',
+      en: 'She said she had never set foot in a gym before the role. Trainer Eric Johnson built an athlete-style program: rotational power, strength and conditioning.'
+    },
+    fact: {
+      pt: 'A inspiração de Johnson para a Viúva Negra de "Vingadores: Ultimato" foi a Sarah Connor de Linda Hamilton em "O Exterminador do Futuro 2".',
+      en: 'Johnson\'s inspiration for Black Widow in "Avengers: Endgame" was Linda Hamilton\'s Sarah Connor in "Terminator 2".'
+    },
+    note: { pt: 'Arremesso rotacional de medicine ball virou rotação na polia; saltos laterais e skaters viraram agachamento com salto e escalador.', en: 'Rotational medicine-ball slam became cable woodchop; lateral bounds and skaters became jump squats and mountain climbers.' },
+    exercises: [
+      ex('cable_woodchop', 3, '10', 0, { group: 'c1' }),
+      ex('jump_squat', 3, '10', 60, { group: 'c1' }),
+      ex('bb_rdl', 3, '10', 0, { group: 'c2' }),
+      ex('bb_ohp', 3, '10', 90, { group: 'c2' }),
+      ex('chin_up', 3, '10', 0, { group: 'c3' }),
+      ex('mountain_climber', 3, '10', 60, { group: 'c3' })
+    ],
+    source: 'https://www.hollywoodreporter.com/news/scarlett-johanssons-avengers-workout-how-get-a-black-widow-body-1204043'
+  },
+  {
+    id: 'jennifer-lawrence-katniss', person: 'Jennifer Lawrence', category: 'film', kind: 'extra', level: 1, difficulty: 2,
+    focus: ['fullbody', 'quads', 'chest', 'core'],
+    title: { pt: 'Preparação da Katniss', en: "Katniss's prep" },
+    who: {
+      pt: 'Atriz americana vencedora do Oscar, Katniss Everdeen na série "Jogos Vorazes" (2012 a 2015).',
+      en: 'Oscar-winning American actress, Katniss Everdeen in "The Hunger Games" series (2012 to 2015).'
+    },
+    why: {
+      pt: 'O Dr. Joe Horrigan tinha pouco tempo para prepará-la. A base foi cardio intenso, com pular corda como favorito, mais um circuito de peso corporal.',
+      en: 'Dr. Joe Horrigan had little time to get her ready. The base was intense cardio, with jump rope as a favorite, plus a bodyweight circuit.'
+    },
+    fact: {
+      pt: 'Horrigan contou que ela nunca chegou atrasada, nunca faltou e nunca reclamou. O circuito pede 10 a 15 repetições em 30 segundos por exercício.',
+      en: 'Horrigan said she was never late, never missed a workout and never complained. The circuit calls for 10-15 reps in 30 seconds per exercise.'
+    },
+    exercises: [
+      ex('jump_rope', 1, '10 min', 60),
+      ex('bodyweight_squat', 3, '30 s', 0, { group: 'c1' }),
+      ex('push_up', 3, '30 s', 0, { group: 'c1' }),
+      ex('sit_up', 3, '30 s', 60, { group: 'c1' })
+    ],
+    source: 'https://www.etonline.com/fashion/148153_jennifer_lawrence_skipped_to_get_hunger_games_shape'
+  },
+  {
+    id: 'dorian-yates-back', person: 'Dorian Yates', category: 'bodybuilding', kind: 'replace', level: 3, difficulty: 4,
+    focus: ['back', 'shoulders'],
+    title: { pt: 'Blood and Guts: costas', en: 'Blood and Guts: back' },
+    who: {
+      pt: 'Fisiculturista inglês, seis vezes Mr. Olympia (1992 a 1997). Abriu a era dos "monstros de massa".',
+      en: 'English bodybuilder, six-time Mr. Olympia (1992 to 1997). He opened the "mass monster" era.'
+    },
+    why: {
+      pt: 'É considerado dono de uma das melhores costas da história. Seu método: só uma série válida por exercício, levada à falha total.',
+      en: 'He is credited with one of the best backs in history. His method: just one working set per exercise, taken to total failure.'
+    },
+    fact: {
+      pt: 'Este treino está na autobiografia dele, "A Warrior\'s Story" (1998). Ele dizia que, se dá para fazer uma segunda série, a primeira não foi de verdade.',
+      en: 'This workout comes from his 1998 autobiography, "A Warrior\'s Story". He said that if you can do a second set, the first wasn\'t real.'
+    },
+    note: { pt: 'Faça 1 ou 2 séries de aquecimento antes do primeiro exercício. Cada série registrada aqui é a série válida, até a falha.', en: 'Do 1-2 warm-up sets before the first exercise. Each set logged here is the working set, to failure.' },
+    exercises: [
+      ex('machine_pulldown', 1, '8-10', 120),
+      ex('bb_row', 1, '8-10', 120),
+      ex('db_row', 1, '8-10', 90),
+      ex('seated_cable_row', 1, '8-10', 90),
+      ex('reverse_pec_deck', 1, '8-10', 60),
+      ex('rear_delt_fly_db', 1, '8-10', 60),
+      ex('back_extension', 1, '8', 60),
+      ex('bb_deadlift', 1, '8', 0)
+    ],
+    source: 'https://barbend.com/news/dorian-yates-back-workout/'
+  },
+  {
+    id: 'rock-chest-hercules', person: 'Dwayne Johnson', category: 'film', kind: 'replace', level: 3, difficulty: 5,
+    focus: ['chest', 'shoulders', 'triceps'],
+    title: { pt: 'Peito de Hércules', en: 'Hercules chest' },
+    who: {
+      pt: '"The Rock": ex-lutador da WWE, um dos atores mais bem pagos do mundo. Treina no "Iron Paradise", a academia que leva para as filmagens.',
+      en: '"The Rock": former WWE wrestler and one of the highest-paid actors in the world. He trains in the "Iron Paradise", the gym he takes to film sets.'
+    },
+    why: {
+      pt: 'É famoso pela ética de trabalho: cardio de manhã cedo e treinos de alto volume, quase todos os dias.',
+      en: 'He is famous for his work ethic: early-morning cardio and high-volume training, almost every day.'
+    },
+    fact: {
+      pt: 'Este é o dia de peito da preparação para "Hércules" (2014), feito depois de uma hora de cardio.',
+      en: 'This is the chest day from his "Hercules" (2014) prep, done after an hour of cardio.'
+    },
+    exercises: [
+      ex('db_bench_press', 4, '10-12', 75),
+      ex('cable_crossover', 3, 'falha', 60),
+      ex('bb_bench_press', 4, '10-12', 90),
+      ex('db_incline_press', 5, '10-12', 75),
+      ex('low_cable_fly', 4, '10-12', 60),
+      ex('bb_incline_press', 3, '10-12', 90)
+    ],
+    source: 'https://www.military.com/military-fitness/workouts/the-real-dwayne-on-hjohnsercules-workout'
+  },
+  {
+    id: 'michael-b-jordan-creed', person: 'Michael B. Jordan', category: 'film', kind: 'extra', level: 1, difficulty: 3,
+    focus: ['fullbody', 'quads', 'chest', 'core'],
+    title: { pt: 'Circuito do Creed', en: 'Creed circuit' },
+    who: {
+      pt: 'Ator americano, Adonis Creed na trilogia "Creed" e Killmonger em "Pantera Negra".',
+      en: 'American actor, Adonis Creed in the "Creed" trilogy and Killmonger in "Black Panther".'
+    },
+    why: {
+      pt: 'O treinador Corey Calliet adapta o treino a cada papel. Para o boxe, priorizou condicionamento: dá para estar trincado e se mover como um robô.',
+      en: 'Trainer Corey Calliet adapts the training to each role. For boxing he prioritized conditioning: you can look ripped and still move like a robot.'
+    },
+    fact: {
+      pt: 'Calliet usava este circuito em "Creed II" e dizia que dava para fazer em casa, na academia, em qualquer lugar.',
+      en: 'Calliet used this circuit for "Creed II" and said it could be done at home, in the gym, anywhere.'
+    },
+    exercises: [
+      ex('jump_rope', 4, '3 min', 0, { group: 'c1' }),
+      ex('kb_swing', 4, '8', 0, { group: 'c1' }),
+      ex('goblet_squat', 4, '8', 0, { group: 'c1' }),
+      ex('push_up', 4, '15', 0, { group: 'c1' }),
+      ex('sit_up', 4, '20', 90, { group: 'c1' })
+    ],
+    source: 'https://menshealth.com.au/?p=5907'
+  },
+  {
+    id: 'henry-cavill-steel', person: 'Henry Cavill', category: 'film', kind: 'replace', level: 2, difficulty: 4,
+    focus: ['hamstrings', 'quads', 'glutes', 'calves'],
+    title: { pt: 'Pernas de aço', en: 'Legs of steel' },
+    who: {
+      pt: 'Ator britânico, Superman em "O Homem de Aço" (2013) e Geralt em "The Witcher".',
+      en: 'British actor, Superman in "Man of Steel" (2013) and Geralt in "The Witcher".'
+    },
+    why: {
+      pt: 'Treinou até 2 horas e meia por dia, 4 a 5 dias por semana, com Mark Twight e depois Michael Blevins, misturando levantamentos olímpicos e musculação.',
+      en: 'He trained up to 2.5 hours a day, 4-5 days a week, with Mark Twight and later Michael Blevins, mixing Olympic lifts and bodybuilding.'
+    },
+    fact: {
+      pt: 'Este é o dia de pernas da fase de musculação de Superman. Blevins diz que mais capacidade de trabalho permite treinar mais forte e por mais tempo.',
+      en: 'This is the leg day from the Superman bodybuilding phase. Blevins says more work capacity lets you train harder and longer.'
+    },
+    exercises: [
+      ex('bb_deadlift', 5, '5', 150),
+      ex('bb_front_squat', 5, '6-8', 120),
+      ex('walking_lunge', 4, '8', 75),
+      ex('standing_calf_raise', 5, '12', 45)
+    ],
+    source: 'https://www.menshealth.com.au/training-takeaways'
   }
 ];
 

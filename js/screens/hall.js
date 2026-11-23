@@ -12,6 +12,9 @@ import { equipmentFor } from '../engine/generator.js';
 import { repsText } from '../data/labels.js';
 import { formatWeight, formatDuration } from '../utils/units.js';
 import { startChallenge } from './start.js';
+import { diffBadge } from '../ui/difficulty.js';
+import { quotesFor } from '../data/quotes.js';
+import { challengeDifficulty } from '../engine/difficulty.js';
 
 let filter = 'all';
 
@@ -74,8 +77,9 @@ function detail(el, c) {
           <p class="hall-title">${esc(L(c.title))}</p>
           <div class="plan-meta">
             <span class="chip">${esc(c.kind === 'replace' ? t('hall.kindReplace') : t('hall.kindExtra'))}</span>
-            <span class="chip">${esc(t('exercise.level' + c.level))}</span>
+            ${diffBadge(challengeDifficulty(c), { label: true })}
             <span class="chip">${esc(t('results.exercises', { n: c.exercises.length }))}</span>
+            <span class="chip src-${c.sourceType === 'inspired' ? 'inspired' : 'doc'}" title="${esc(t(c.sourceType === 'inspired' ? 'hall.inspiredHint' : 'hall.documentedHint'))}">${icon(c.sourceType === 'inspired' ? 'sparkle' : 'check')}${esc(t(c.sourceType === 'inspired' ? 'hall.inspired' : 'hall.documented'))}</span>
           </div>
         </div>
       </header>
@@ -85,7 +89,9 @@ function detail(el, c) {
         <p>${esc(L(c.who))}</p>
         <p class="muted" style="margin-top:10px"><strong>${esc(t('hall.whyRef'))}</strong> ${esc(L(c.why))}</p>
         <div class="sug legend" style="margin-top:12px">${icon('sparkle')}<span><strong>${esc(t('hall.funFact'))}</strong> ${esc(L(c.fact))}</span></div>
-        ${c.source ? `<a class="btn btn-sm btn-ghost" href="${esc(c.source)}" target="_blank" rel="noopener" style="margin-top:10px">${esc(t('hall.source'))}</a>` : ''}
+        <p class="setting-hint" style="margin-top:10px">${esc(t(c.sourceType === 'inspired' ? 'hall.inspiredHint' : 'hall.documentedHint'))}</p>
+        ${c.source ? `<a class="btn btn-sm btn-ghost" href="${esc(c.source)}" target="_blank" rel="noopener" style="margin-top:6px">${esc(t('hall.source'))}</a>` : ''}
+        ${quotesFor(c.person).length ? `<div class="legend-quotes">${quotesFor(c.person).map((q) => `<blockquote><p>“${esc(L(q.text))}”</p><cite>${esc(c.person)} · ${esc(L(q.src))}</cite></blockquote>`).join('')}</div>` : ''}
       </div>
 
       <div class="card">
@@ -134,6 +140,7 @@ export default {
             <div>
               <h2>${esc(c.person)}</h2>
               <p class="hall-title">${esc(L(c.title))}</p>
+              <div class="diff-row">${diffBadge(challengeDifficulty(c), { label: true })}</div>
               <p class="setting-hint">${esc(st.pl ? placementText(st.pl, lang) : t('hall.noPlan'))}</p>
             </div>
           </div>
@@ -170,6 +177,7 @@ export default {
               <div class="plan-meta">
                 <span class="chip">${esc(t('triage.challenges.' + x.category))}</span>
                 <span class="chip">${esc(x.kind === 'replace' ? t('hall.kindReplace') : t('hall.kindExtra'))}</span>
+                ${diffBadge(challengeDifficulty(x), { compact: true })}
               </div>
             </a>`).join('')}
         </div>

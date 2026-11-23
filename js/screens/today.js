@@ -10,11 +10,15 @@ import { loadWorkouts, getOpen, doneToday, workoutsThisWeek, streak } from '../d
 import { startDay } from './start.js';
 import { dayLabel } from '../data/labels.js';
 import { phraseOfDay } from '../data/phrases.js';
+import { legendQuoteOfDay } from '../data/quotes.js';
 import { hallState } from './hall.js';
 import { startChallenge } from './start.js';
 import { getRecent } from '../data/workouts.js';
 import { formatDuration } from '../utils/units.js';
 import { cycleCard } from './dashboard.js';
+import { diffBadge } from '../ui/difficulty.js';
+import { collapsible, bindCollapsibles } from '../ui/collapse.js';
+import { difficultyOf } from '../engine/difficulty.js';
 import { cycleInfo } from '../data/stats.js';
 
 function greeting() {
@@ -85,15 +89,14 @@ export default {
             </div>
           </div>`;
       } else if (today) {
-        workoutCard = `
-          <div class="card">
-            <div class="card-head">
-              <div class="card-title"><span class="day-badge day-${today.key}">${today.key}</span>
-                <div><span class="eyebrow">${esc(t('todayPlan.todayIs', { k: today.key }))}</span><h2>${esc(t('dayTypes.' + today.type))}</h2></div></div>
-            </div>
-            ${exerciseList(today, lang)}
-            <button type="button" class="btn btn-primary btn-block" data-start style="margin-top:14px">${icon('dumbbell')}${esc(t('todayPlan.start'))}</button>
-          </div>`;
+        workoutCard = collapsible({
+          key: 'today-workout', cls: 'today-workout',
+          head: `<span class="day-badge day-${today.key}">${today.key}</span>
+            <div style="min-width:0"><span class="eyebrow">${esc(t('todayPlan.todayIs', { k: today.key }))} · ${esc(t('results.exercises', { n: today.exercises.length }))}</span><h2>${esc(t('dayTypes.' + today.type))}</h2></div>`,
+          extra: `${diffBadge(difficultyOf(today.exercises), { compact: true })}<button type="button" class="btn btn-primary btn-sm today-go" data-start aria-label="${esc(t('todayPlan.start'))}">${icon('dumbbell')}<span>${esc(t('todayPlan.go'))}</span></button>`,
+          body: `${exerciseList(today, lang)}
+            <button type="button" class="btn btn-primary btn-block" data-start style="margin-top:14px">${icon('dumbbell')}${esc(t('todayPlan.start'))}</button>`
+        });
       } else {
         const dayName = next ? tl('weekdaysLong')[next.date.getDay()] : '';
         workoutCard = `
@@ -122,6 +125,31 @@ export default {
       else if (!/full|conditioning/.test(todayDay.type)) context = 'upper';
     }
     const phrase = phraseOfDay(context, lang);
+
+    // Semana de desafio: a frase do dia vem da lenda, quando há citação verificada.
+    const legend = hall && hall.current && !hall.doneThisWeek ? hall.current : null;
+    const lq = legend ? legendQuoteOfDay(legend.person) : null;
+    const quoteCard = lq ? `
+      <div class="card quote-card legend-quote">
+        <div class="quote">
+          <div class="avatar cat-${esc(legend.category)}">${esc(legend.person.split(' ').map((p) => p[0]).slice(0, 2).join(''))}</div>
+          <div>
+            <span class="eyebrow">${esc(t('today.quoteLegend'))}</span>
+            <p class="quote-text">“${esc(lq.text[lang] || lq.text.pt)}”</p>
+            <p class="quote-author">${esc(legend.person)} · ${esc(lq.src[lang] || lq.src.pt)}</p>
+          </div>
+        </div>
+      </div>` : `
+      <div class="card quote-card">
+        <div class="quote">
+          <img class="coach-avatar" src="icons/icon-192.png" alt="" width="44" height="44">
+          <div>
+            <span class="eyebrow">${esc(t('today.quoteTitle'))}</span>
+            <p class="quote-text">${esc(phrase)}</p>
+            <p class="quote-author">${esc(t('coach.name'))}</p>
+          </div>
+        </div>
+      </div>`;
 
     const hallCard = hall && hall.current && !hall.doneThisWeek ? `
       <div class="card hall-mini">
@@ -154,21 +182,13 @@ export default {
 
         ${row && cycleInfo(row).daysLeft <= 7 ? cycleCard(row, lang, { compact: true }) : ''}
 
-        ${workoutCard}
+        ${quoteCard}
 
         ${hallCard}
 
-        <div class="grid grid-2">
-          <div class="card">
-            <div class="card-head"><span class="eyebrow">${esc(t('today.quoteTitle'))}</span></div>
-            <div class="quote">
-              <div class="quote-mark">${icon('quote')}</div>
-              <div>
-                <p class="quote-text">${esc(phrase)}</p>
-                <p class="quote-author">${esc(t('today.quoteAuthor'))}</p>
-              </div>
-            </div>
-          </div>
+        ${workoutCard}
+
+        <div class="grid">
           ${row ? `
           <div class="card">
             <div class="card-head"><span class="eyebrow">${esc(t('plan.schedule'))}</span><a class="btn btn-sm btn-ghost" href="#plano">${esc(t('nav.plan'))}${icon('chevron')}</a></div>
@@ -186,8 +206,11 @@ export default {
         </div>
       </section>`;
 
-    const start = el.querySelector('[data-start]');
-    if (start) start.addEventListener('click', () => startDay(dayForDate(row.data)));
+    bindCollapsibles(el);
+    el.querySelectorAll('[data-start]').forEach((b) => b.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      startDay(dayForDate(row.data));
+    }));
     const hs = el.querySelector('[data-hall-start]');
     if (hs) hs.addEventListener('click', () => startChallenge(hall.current));
   }

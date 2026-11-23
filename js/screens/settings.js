@@ -77,7 +77,11 @@ export default {
                 </div>`, true)}
               ${row('moon', t('settings.mode'), '', seg('mode', [['dark', t('settings.dark')], ['light', t('settings.light')]], s.mode))}
             </div>
-            <div class="card-head" style="margin-top:12px"><div class="card-title">${icon('timer')}<h2>${esc(t('settings.training'))}</h2></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><div class="card-title">${icon('timer')}<h2>${esc(t('settings.training'))}</h2></div></div>
             <div class="settings-group">
               ${row('timer', t('settings.rest'), t('settings.restHint'), `
                 <div class="stepper">
@@ -86,7 +90,6 @@ export default {
                   <button type="button" class="icon-btn" data-rest="1" aria-label="+${REST_STEP} s">${icon('plus')}</button>
                 </div>`)}
             </div>
-          </div>
         </div>
 
         <div class="card">
