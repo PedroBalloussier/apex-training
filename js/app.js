@@ -10,6 +10,8 @@ import profileScreen from './screens/profile.js';
 import triageScreen from './screens/triage.js';
 import sessionScreen from './screens/session.js';
 import { quickStart } from './screens/start.js';
+import calendarScreen from './screens/calendar.js';
+import exerciseScreen from './screens/exercise.js';
 import { resetWorkouts } from './data/workouts.js';
 import { soonScreen } from './screens/soon.js';
 
@@ -17,23 +19,28 @@ import { soonScreen } from './screens/soon.js';
 const ROUTES = [
   { id: 'today', hash: 'hoje', ic: 'home', screen: today, tab: true },
   { id: 'plan', hash: 'plano', ic: 'plan', screen: planScreen, tab: true },
-  { id: 'calendar', hash: 'calendario', ic: 'calendar', screen: soonScreen({ key: 'calendar', ic: 'calendar', stage: 4 }), tab: true },
+  { id: 'calendar', hash: 'calendario', ic: 'calendar', screen: calendarScreen, tab: true },
   { id: 'dashboard', hash: 'progresso', ic: 'chart', screen: soonScreen({ key: 'dashboard', ic: 'chart', stage: 5 }), tab: true },
   { id: 'hall', hash: 'hall', ic: 'trophy', screen: soonScreen({ key: 'hall', ic: 'trophy', stage: 6 }), group: 'social' },
   { id: 'party', hash: 'party', ic: 'users', screen: soonScreen({ key: 'party', ic: 'users', stage: 7 }), group: 'social' },
   { id: 'settings', hash: 'config', ic: 'gear', screen: settingsScreen, group: 'bottom' },
   { id: 'profile', hash: 'perfil', ic: 'users', screen: profileScreen, hidden: true },
   { id: 'triage', hash: 'triagem', ic: 'sparkle', screen: triageScreen, hidden: true },
-  { id: 'session', hash: 'treino', ic: 'dumbbell', screen: sessionScreen, hidden: true }
+  { id: 'session', hash: 'treino', ic: 'dumbbell', screen: sessionScreen, hidden: true },
+  { id: 'exercise', hash: 'ex-', prefix: true, ic: 'dumbbell', screen: exerciseScreen, hidden: true }
 ];
 
 const app = document.getElementById('app');
 let currentId = 'today';
+let currentParam = null;
 let account = null;          // módulo de conta (carregado sob demanda)
 let mode = 'loading';        // loading | error | auth | app
 
 function routeFromHash() {
-  const h = (location.hash || '').replace('#', '');
+  const h = decodeURIComponent((location.hash || '').replace('#', ''));
+  const pre = ROUTES.find((r) => r.prefix && h.startsWith(r.hash) && h.length > r.hash.length);
+  if (pre) { currentParam = h.slice(pre.hash.length); return pre; }
+  currentParam = null;
   return ROUTES.find((r) => r.hash === h) || ROUTES[0];
 }
 
@@ -109,7 +116,7 @@ async function renderScreen() {
   const route = ROUTES.find((r) => r.id === currentId);
   document.title = `${t('nav.' + currentId)} · ${t('app.name')}`;
   try {
-    await route.screen.render(main);
+    await route.screen.render(main, currentParam);
   } catch (err) {
     console.error('[Apex]', err);
     main.innerHTML = `<div class="center-state"><div><p class="muted">${esc(t('auth.errGeneric'))}</p></div></div>`;
@@ -150,9 +157,11 @@ async function render() {
   await renderScreen();
 }
 
+let lastHash = location.hash;
 function onRoute() {
   const r = routeFromHash();
-  const changed = r.id !== currentId;
+  const changed = r.id !== currentId || location.hash !== lastHash;
+  lastHash = location.hash;
   currentId = r.id;
   render();
   if (changed) window.scrollTo({ top: 0 });

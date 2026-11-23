@@ -44,7 +44,7 @@ export function exerciseList(day, lang, { actions = false } = {}) {
     return `<li class="ex-row ${inGroup ? 'grouped' : ''} ${first ? 'g-first' : ''} ${last ? 'g-last' : ''}">
       ${first ? `<span class="group-tag">${esc(t('session.biset'))}</span>` : ''}
       <span class="ex-num num">${i + 1}</span>
-      <div class="ex-main"><span class="ex-name">${esc(exerciseName(x.id, lang))}</span><span class="ex-meta">${esc(meta)}</span></div>
+      <div class="ex-main"><a class="ex-name ex-link" href="#ex-${esc(x.id)}">${esc(exerciseName(x.id, lang))}</a><span class="ex-meta">${esc(meta)}</span></div>
       <div class="ex-dose num">${x.sets} × ${esc(x.reps)}${x.restSec && (!inGroup || last) ? `<small>${esc(t('plan.rest'))} ${esc(formatDuration(x.restSec, lang))}</small>` : ''}</div>
       ${actions ? `<button type="button" class="icon-btn" data-ex-menu="${i}" aria-label="${esc(t('plan.actions'))}">${icon('more')}</button>` : ''}
     </li>`;

@@ -35,11 +35,13 @@ export function openSheet({ title, content, onMount, label }) {
   const close = () => {
     root.innerHTML = '';
     document.removeEventListener('keydown', onKey);
+    window.removeEventListener('hashchange', close);
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   };
   const onKey = (e) => { if (e.key === 'Escape') close(); };
   backdrop.addEventListener('click', (e) => { if (e.target === backdrop || e.target.closest('[data-dismiss]')) close(); });
   document.addEventListener('keydown', onKey);
+  window.addEventListener('hashchange', close);
   if (onMount) onMount(sheet, close);
   const first = sheet.querySelector('button, [href], input, select, textarea');
   if (first) first.focus();

@@ -2,7 +2,7 @@
 
 App de treino: plano montado pela triagem, troca de exercícios por equivalentes, registro de séries, progresso, Hall da Fama e Party entre amigos.
 
-Nome de trabalho. Versão atual: **v0.3 (etapa 3: sessão de treino, troca de exercícios e progressão)**.
+Nome de trabalho. Versão atual: **v0.4 (etapa 4: página do exercício e calendário)**.
 
 ## Estrutura
 
@@ -44,7 +44,7 @@ Abra http://localhost:8000.
 1. Fundação (feito)
 2. Cadastro, triagem, catálogo de exercícios e geração de planos (feito)
 3. Hoje, Plano e Sessão (feito)
-4. Exercício e Calendário
+4. Exercício e Calendário (feito)
 5. Dashboard, corpo, ciclo, relatório e nova triagem
 6. Hall da Fama e banco de frases
 7. Party

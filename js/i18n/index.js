@@ -4,6 +4,8 @@ import pt2 from './pt2.js';
 import en2 from './en2.js';
 import pt3 from './pt3.js';
 import en3 from './en3.js';
+import pt4 from './pt4.js';
+import en4 from './en4.js';
 
 function merge(...parts) {
   const out = {};
@@ -15,7 +17,7 @@ function merge(...parts) {
   return out;
 }
 
-const DICTS = { pt: merge(pt1, pt2, pt3), en: merge(en1, en2, en3) };
+const DICTS = { pt: merge(pt1, pt2, pt3, pt4), en: merge(en1, en2, en3, en4) };
 let lang = 'pt';
 
 export function setLanguage(l) {

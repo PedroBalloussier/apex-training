@@ -157,7 +157,7 @@ function render(el) {
           <article class="card ex-card ${g.inGroup ? 'grouped' : ''} ${g.first ? 'g-first' : ''} ${g.last && g.inGroup ? 'g-last' : ''}" data-ex="${p}">
             <div class="ex-card-head">
               <div class="ex-main">
-                <span class="ex-name">${esc(exerciseName(x.id, lang))}</span>
+                <a class="ex-name ex-link" href="#ex-${esc(x.id)}">${esc(exerciseName(x.id, lang))}${icon('info')}</a>
                 <span class="ex-meta">${esc(x.sets)} × ${esc(x.reps)}${x.restSec && g.last ? ' · ' + esc(t('plan.rest')) + ' ' + esc(formatDuration(x.restSec, lang)) : ''}${e && e.unilateral ? ' · ' + esc(t('session.perSide')) : ''}</span>
               </div>
               <button type="button" class="icon-btn" data-swap="${p}" aria-label="${esc(t('plan.swap'))}" title="${esc(t('plan.swap'))}" ${anyDone ? 'disabled' : ''}>${icon('dumbbell')}</button>

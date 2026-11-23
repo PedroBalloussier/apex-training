@@ -148,3 +148,32 @@ export function streak(schedule) {
   }
   return count;
 }
+
+/** Histórico de um exercício: sessões (mais recentes primeiro) com as séries feitas. */
+export async function exerciseHistory(exerciseId) {
+  const { data } = await supabase.from('workout_sets').select('workout_id, set_number, reps, weight_kg, to_failure, created_at')
+    .eq('done', true).eq('exercise_id', exerciseId).order('created_at', { ascending: false }).limit(400);
+  const map = new Map();
+  for (const s of data || []) {
+    if (!map.has(s.workout_id)) map.set(s.workout_id, { workoutId: s.workout_id, date: s.created_at, sets: [] });
+    map.get(s.workout_id).sets.push(s);
+  }
+  const sessions = [...map.values()];
+  sessions.forEach((x) => x.sets.sort((a, b) => a.set_number - b.set_number));
+  return sessions;
+}
+
+/** Treinos concluídos num intervalo de datas. */
+export async function workoutsBetween(start, end) {
+  const { data } = await supabase.from('workouts').select('id, plan_id, day_key, day_type, status, started_at, finished_at, duration_sec')
+    .eq('status', 'done').gte('started_at', start.toISOString()).lt('started_at', end.toISOString())
+    .order('started_at', { ascending: true }).limit(200);
+  return data || [];
+}
+
+/** Séries feitas de um treino. */
+export async function workoutSets(workoutId) {
+  const { data } = await supabase.from('workout_sets').select('*').eq('workout_id', workoutId).eq('done', true)
+    .order('position', { ascending: true }).order('set_number', { ascending: true });
+  return data || [];
+}

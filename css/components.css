@@ -401,3 +401,63 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .sheet .kpi { min-height: 80px; padding: 12px 14px; }
 .sheet .kpi-value { font-size: 21px; white-space: nowrap; }
 .chip { white-space: nowrap; }
+
+/* ---------- Página do exercício ---------- */
+.back-link { align-self: flex-start; margin-left: -10px; }
+.back-link svg { transform: rotate(180deg); }
+.ex-link { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.ex-link:hover { color: var(--primary); }
+.ex-link svg { width: 16px; height: 16px; color: var(--text-3); }
+.video-card { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.video-thumb, .video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: #000; }
+.video-thumb { border: 0; padding: 0; cursor: pointer; display: block; }
+.video-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: .9; transition: opacity .18s var(--ease); }
+.video-thumb:hover img { opacity: 1; }
+.play-btn { position: absolute; inset: 0; margin: auto; width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.55); backdrop-filter: blur(6px); }
+.play-btn svg { width: 30px; height: 30px; fill: #fff; margin-left: 4px; }
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-links { display: flex; gap: 6px; flex-wrap: wrap; }
+.guide-lists { display: flex; flex-direction: column; gap: 16px; }
+.guide-lists .feature-list { margin-top: 10px; max-width: none; }
+.feature-list.bad li svg { color: var(--danger); }
+.spark { width: 100%; height: 72px; display: block; margin: 4px 0 8px; }
+.hist-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.hist-list li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.hist-list li:last-child { border-bottom: 0; }
+.hist-date { color: var(--text-2); font-weight: 600; white-space: nowrap; text-decoration: none; }
+a.hist-date:hover { color: var(--primary); }
+.hist-sets { color: var(--text); text-align: right; }
+hr.sep { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+
+/* ---------- Calendário ---------- */
+.cal-nav { display: flex; align-items: center; gap: 8px; }
+.cal-title { min-width: 0; flex: 1; }
+.cal-cell.empty:hover { border-color: transparent; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cal-head { margin-bottom: 8px; }
+.cal-head span { text-align: center; font-size: 11.5px; font-weight: 650; color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; }
+.cal-cell {
+  position: relative; aspect-ratio: 1; min-height: 44px; border-radius: 12px; border: 1px solid transparent;
+  background: var(--surface-2); color: var(--text-2); cursor: pointer; padding: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 2px;
+  transition: border-color .18s var(--ease);
+}
+.cal-cell:hover { border-color: var(--line-2); }
+.cal-cell.empty { background: transparent; cursor: default; }
+.cal-cell.today { border-color: var(--primary); color: var(--text); }
+.cal-cell.rest { opacity: .7; }
+.cal-num { font-size: 13px; font-weight: 650; }
+.cal-dot { width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; font-size: 11.5px; font-weight: 750; color: #0B0F14; }
+.cal-dot.planned { background: transparent; color: var(--text-2); border: 1.5px dashed var(--line-2); }
+.cal-dot.missed { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+.cal-check { position: absolute; top: 4px; right: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--success); color: #04210F; display: grid; place-items: center; }
+.cal-check svg { width: 10px; height: 10px; stroke-width: 3; }
+.cal-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 12.5px; color: var(--text-2); }
+.cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.lg { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.lg.done { background: var(--day-b); } .lg.planned { border: 1.5px dashed var(--line-2); }
+.lg.missed { background: color-mix(in srgb, var(--danger) 40%, transparent); } .lg.rest { background: var(--surface-3); }
+@media (max-width: 420px) {
+  .cal-grid { gap: 4px; } .cal-cell { padding: 4px; border-radius: 10px; }
+  .cal-dot { width: 20px; height: 20px; font-size: 10.5px; border-radius: 6px; }
+}
