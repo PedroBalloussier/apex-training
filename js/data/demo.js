@@ -52,7 +52,69 @@ function materialize(file) {
     const { daysAgo, ...vals } = b;
     db.body_measurements.push({ id: uid(), user_id: userId, measured_on: iso, ...vals, created_at: d.toISOString() });
   }
+  seedParties(db, now);
   return db;
+}
+
+/* ---------- Party simulada: amigos fictícios e pontos ---------- */
+const isoDay = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const seasonEnd = (period, start) => (period === 'weekly' ? addDays(start, 6) : addDays(new Date(start.getFullYear(), start.getMonth() + 1, start.getDate()), -1));
+const PTS = { workout: 10, challenge: 25, record: 5, streak: 15 };
+const CAP = 50;
+
+function seedParties(db, now) {
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const me = 'demo-user';
+  const myName = (db.profiles[0]?.name || 'Pedro').split(' ')[0];
+  const friends = [
+    { id: 'f-ana', name: 'Ana', days: 4, p: 0.62 }, { id: 'f-joao', name: 'João', days: 3, p: 0.42 },
+    { id: 'f-bia', name: 'Bia', days: 5, p: 0.7 }, { id: 'f-rafa', name: 'Rafa', days: 3, p: 0.3 }
+  ];
+  db.parties = []; db.party_members = []; db.party_events = [];
+  const today = new Date(now); today.setHours(12, 0, 0, 0);
+  const myWorkoutDays = new Map();
+  for (const w of db.workouts) { const k = isoDay(new Date(w.started_at)); if (!myWorkoutDays.has(k)) myWorkoutDays.set(k, w.id); }
+
+  const make = ({ name, format, period, season, startAgo, challenge, members, code }) => {
+    const start = addDays(today, -startAgo);
+    const p = {
+      id: uid(), code, name, format, period, categories: ['film', 'fight', 'athletes', 'bodybuilding', 'legends'], hall_bonus: true,
+      challenge_id: challenge || null, season, season_start: isoDay(start), season_end: isoDay(seasonEnd(period, start)),
+      owner_id: me, created_at: addDays(start, -20).toISOString()
+    };
+    db.parties.push(p);
+    const end = new Date(p.season_end + 'T12:00:00');
+    for (const m of members) {
+      db.party_members.push({ party_id: p.id, user_id: m.id, display_name: m.name, days_per_week: m.days, joined_at: start.toISOString() });
+      db.party_events.push({ id: uid(), party_id: p.id, user_id: m.id, kind: 'join', ref: m.id === me ? '' : String(season), points: 0, day: p.season_start, created_at: start.toISOString() });
+      let doneChallenge = false;
+      for (let d = new Date(start); d <= today && d <= end; d = addDays(d, 1)) {
+        const day = isoDay(d);
+        let total = 0;
+        const push = (kind, ref, pts) => {
+          const v = Math.min(pts, CAP - total); if (v <= 0) return;
+          total += v;
+          db.party_events.push({ id: uid(), party_id: p.id, user_id: m.id, kind, ref, points: v, day, created_at: new Date(d.getTime() + 3600e3 * (7 + Math.floor(rnd() * 12))).toISOString() });
+        };
+        if (m.id === me) {
+          if (!myWorkoutDays.has(day)) continue;
+          push('workout', myWorkoutDays.get(day), PTS.workout);
+          if (rnd() < 0.3) push('record', `bb_bench_press:${myWorkoutDays.get(day)}`, PTS.record);
+        } else {
+          if (rnd() > m.p) continue;
+          if (format === 'hall' && !doneChallenge && challenge && rnd() < 0.25) { doneChallenge = true; push('challenge', `${challenge}:${day}`, PTS.challenge); }
+          else push('workout', `${m.id}-${day}`, PTS.workout);
+          if (rnd() < 0.25) push('record', `${['bb_back_squat', 'bb_deadlift', 'pull_up', 'db_shoulder_press'][Math.floor(rnd() * 4)]}:${m.id}-${day}`, PTS.record);
+        }
+      }
+    }
+  };
+  const meM = { id: me, name: myName, days: 4 };
+  make({ name: 'Monstros da Ericeira', format: 'hall', period: 'monthly', season: 2, startAgo: 12, challenge: 'chris-evans-legs', code: 'APX7K2', members: [meM, ...friends] });
+  make({ name: 'Duelo com o João', format: 'duel', period: 'weekly', season: 1, startAgo: 9, code: 'DUEL4J', members: [meM, friends[1]] });
+  make({ name: 'Constância 2026', format: 'consistency', period: 'monthly', season: 1, startAgo: 18, code: 'CNST26', members: [meM, friends[0], friends[2], friends[3]] });
 }
 
 export function validateDemo(file) {
@@ -119,6 +181,7 @@ class Query {
       if (this.op === 'delete') {
         data[this.t] = T.filter((r) => !rows.includes(r));
         if (this.t === 'workouts') { const ids = new Set(rows.map((r) => r.id)); data.workout_sets = data.workout_sets.filter((s) => !ids.has(s.workout_id)); }
+        if (this.t === 'parties') { const ids = new Set(rows.map((r) => r.id)); data.party_members = (data.party_members || []).filter((m) => !ids.has(m.party_id)); data.party_events = (data.party_events || []).filter((e) => !ids.has(e.party_id)); }
         persist();
         return { data: null, error: null };
       }
@@ -134,6 +197,59 @@ class Query {
   }
 }
 
+function partyRpc(name, a) {
+  const data = load();
+  data.parties = data.parties || []; data.party_members = data.party_members || []; data.party_events = data.party_events || [];
+  const me = USER.id;
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  const todayIso = isoDay(today);
+  const out = (v) => { persist(); return { data: v, error: null }; };
+  if (name === 'party_create') {
+    const alpha = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const code = Array.from({ length: 6 }, () => alpha[Math.floor(Math.random() * alpha.length)]).join('');
+    const p = { id: uid(), code, name: a.p_name.trim(), format: a.p_format, period: a.p_period, categories: a.p_categories || [], hall_bonus: a.p_hall_bonus !== false,
+      challenge_id: a.p_challenge || null, season: 1, season_start: todayIso, season_end: isoDay(seasonEnd(a.p_period, today)), owner_id: me, created_at: new Date().toISOString() };
+    data.parties.push(p);
+    data.party_members.push({ party_id: p.id, user_id: me, display_name: a.p_display_name, days_per_week: a.p_days || 3, joined_at: new Date().toISOString() });
+    data.party_events.push({ id: uid(), party_id: p.id, user_id: me, kind: 'join', ref: '', points: 0, day: todayIso, created_at: new Date().toISOString() });
+    return out(p);
+  }
+  if (name === 'party_join') {
+    const p = data.parties.find((x) => x.code === String(a.p_code || '').toUpperCase().trim());
+    if (!p) return { data: null, error: { message: 'party_not_found' } };
+    return out(p.id);
+  }
+  if (name === 'party_new_season') {
+    const p = data.parties.find((x) => x.id === a.p_party && x.owner_id === me);
+    if (!p) return { data: null, error: { message: 'not_owner' } };
+    Object.assign(p, { season: p.season + 1, season_start: todayIso, season_end: isoDay(seasonEnd(p.period, today)), challenge_id: a.p_challenge || p.challenge_id });
+    return out(p);
+  }
+  if (name === 'party_log') {
+    const base = PTS[a.p_kind] || 0;
+    let total = 0;
+    if (!base) return out(0);
+    for (const p of data.parties) {
+      if (!data.party_members.some((m) => m.party_id === p.id && m.user_id === me)) continue;
+      if (todayIso < p.season_start || todayIso > p.season_end) continue;
+      let pts = base;
+      if (a.p_kind === 'challenge') {
+        if (p.format === 'hall') { if (p.challenge_id && p.challenge_id !== String(a.p_ref).split(':')[0]) pts = 0; }
+        else if (!p.hall_bonus) pts = 0;
+      }
+      if (!pts) continue;
+      const used = data.party_events.filter((e) => e.party_id === p.id && e.user_id === me && e.day === todayIso).reduce((x, e) => x + e.points, 0);
+      pts = Math.min(pts, CAP - used);
+      if (pts <= 0) continue;
+      if (data.party_events.some((e) => e.party_id === p.id && e.user_id === me && e.kind === a.p_kind && e.ref === a.p_ref)) continue;
+      data.party_events.push({ id: uid(), party_id: p.id, user_id: me, kind: a.p_kind, ref: a.p_ref, points: pts, day: todayIso, created_at: new Date().toISOString() });
+      total += pts;
+    }
+    return out(total);
+  }
+  return { data: null, error: { message: 'unknown rpc' } };
+}
+
 export function demoClient() {
   return {
     auth: {
@@ -144,7 +260,9 @@ export function demoClient() {
       async signOut() { exitDemo(); return { error: null }; }
     },
     from: (t) => new Query(t),
-    async rpc(name, { p_plan, p_triage }) {
+    async rpc(name, args) {
+      if (name.startsWith('party_')) return partyRpc(name, args);
+      const { p_plan, p_triage } = args;
       const data = load();
       data.plans.filter((p) => p.status === 'active').forEach((p) => { p.status = 'archived'; p.ended_at = new Date().toISOString(); });
       const id = uid();

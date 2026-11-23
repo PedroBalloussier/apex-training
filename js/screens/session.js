@@ -6,12 +6,15 @@ import { toast, openSheet } from '../ui/feedback.js';
 import { getSettings } from '../data/settings.js';
 import { loadCatalog, getExercise, exerciseName } from '../data/catalog.js';
 import {
-  loadWorkouts, getOpen, saveSet, updateOpenExercises, finishWorkout, discardWorkout, lastSessions, bestWeights
+  loadWorkouts, getOpen, saveSet, updateOpenExercises, finishWorkout, discardWorkout, lastSessions, bestWeights, streak
 } from '../data/workouts.js';
 import { suggest, repRange } from '../engine/progression.js';
 import { weightToUser, weightFromUser, formatWeight, formatDuration } from '../utils/units.js';
 import { openSwap } from '../ui/swap.js';
 import { markDone } from '../data/hall.js';
+import { logWorkoutPoints } from '../data/party.js';
+import { getActivePlan } from '../data/account.js';
+import { weekKey } from '../engine/hall.js';
 import { dayLabel, repsText } from '../data/labels.js';
 
 let ctx = null;          // { workoutId, last: Map, best: Map, extra: {pos: n}, draft: {} }
@@ -346,6 +349,10 @@ function openFinish(el) {
           }
           stopRest(); close(); ctx = null;
           toast(t('session.finished'), 'trophy');
+          // Pontos da Party em segundo plano (não atrasa o fim do treino)
+          const plan = getActivePlan();
+          logWorkoutPoints({ workout: doneRow, prs, streakDays: plan ? streak(plan.data.schedule) : 0, weekKey: weekKey() })
+            .then((n) => { if (n > 0) setTimeout(() => toast(t('party.pointsToast', { n }), 'users'), 1600); });
           location.hash = '#hoje';
         } catch (err) {
           okBtn.disabled = false;

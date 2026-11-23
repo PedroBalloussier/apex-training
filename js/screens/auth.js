@@ -36,8 +36,9 @@ export function renderAuth(root) {
             <div class="field"><label for="a-email">${esc(t('auth.email'))}</label>
               <input class="input" id="a-email" name="email" type="email" inputmode="email" autocomplete="email" required></div>
             <div class="field"><label for="a-pass">${esc(t('auth.password'))}</label>
-              <input class="input" id="a-pass" name="password" type="password" minlength="8"
+              <div class="pass-wrap"><input class="input" id="a-pass" name="password" type="password" minlength="8"
                 autocomplete="${mode === 'signup' ? 'new-password' : 'current-password'}" required>
+                <button type="button" class="pass-toggle" data-pass aria-label="${esc(t('auth.showPass'))}" aria-pressed="false">${icon('eye')}</button></div>
               ${mode === 'signup' ? `<span class="setting-hint">${esc(t('auth.passwordHint'))}</span>` : ''}</div>
             <div class="form-error" hidden></div>
             <button class="btn btn-primary btn-block" type="submit">${esc(mode === 'signup' ? t('auth.submitSignUp') : t('auth.submitSignIn'))}</button>
@@ -57,6 +58,16 @@ export function renderAuth(root) {
   const btn = form.querySelector('button[type="submit"]');
   const showErr = (key) => { errBox.textContent = t(key); errBox.hidden = false; };
 
+  const passBtn = form.querySelector('[data-pass]');
+  if (passBtn) passBtn.addEventListener('click', () => {
+    const input = form.querySelector('#a-pass');
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    passBtn.innerHTML = icon(show ? 'eyeOff' : 'eye');
+    passBtn.setAttribute('aria-pressed', String(show));
+    passBtn.setAttribute('aria-label', t(show ? 'auth.hidePass' : 'auth.showPass'));
+    input.focus();
+  });
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errBox.hidden = true;

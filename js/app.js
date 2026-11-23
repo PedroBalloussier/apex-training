@@ -21,7 +21,8 @@ import { resetBody } from './data/body.js';
 import { demoBar, bindDemoBar } from './ui/demo-ui.js';
 import { demoActive } from './data/demo.js';
 import { resetWorkouts } from './data/workouts.js';
-import { soonScreen } from './screens/soon.js';
+import partyScreen, { inviteScreen } from './screens/party.js';
+import { resetParty } from './data/party.js';
 
 // Rotas: o hash é o nome em português (sem "settings", reservado em alguns ambientes)
 const ROUTES = [
@@ -32,7 +33,9 @@ const ROUTES = [
   { id: 'body', hash: 'corpo', ic: 'scale', screen: bodyScreen, group: 'progress' },
   { id: 'hall', hash: 'hall', ic: 'trophy', screen: hallScreen, group: 'social' },
   { id: 'hall', hash: 'hall-', prefix: true, ic: 'trophy', screen: hallScreen, hidden: true },
-  { id: 'party', hash: 'party', ic: 'users', screen: soonScreen({ key: 'party', ic: 'users', stage: 7 }), group: 'social' },
+  { id: 'party', hash: 'party', ic: 'users', screen: partyScreen, group: 'social' },
+  { id: 'party', hash: 'party-', prefix: true, ic: 'users', screen: partyScreen, hidden: true },
+  { id: 'invite', hash: 'convite-', prefix: true, ic: 'users', screen: inviteScreen, hidden: true },
   { id: 'settings', hash: 'config', ic: 'gear', screen: settingsScreen, group: 'bottom' },
   { id: 'profile', hash: 'perfil', ic: 'users', screen: profileScreen, hidden: true },
   { id: 'triage', hash: 'triagem', ic: 'sparkle', screen: triageScreen, hidden: true },
@@ -151,8 +154,19 @@ function renderState(kind) {
 }
 
 /** Regras de acesso às telas: sem conta → entrar; perfil incompleto → perfil. */
+const INVITE_KEY = 'apex:invite';
 function guardRoute() {
-  if (account.profileComplete()) return;
+  // Convite aberto antes de criar a conta ou completar o perfil: guarda e retoma depois
+  if (currentId === 'invite' && currentParam) { try { sessionStorage.setItem(INVITE_KEY, currentParam); } catch (e) {} }
+  if (account.profileComplete()) {
+    let pending = null;
+    try { pending = sessionStorage.getItem(INVITE_KEY); } catch (e) {}
+    if (pending) {
+      try { sessionStorage.removeItem(INVITE_KEY); } catch (e) {}
+      if (currentId !== 'invite') { location.hash = '#convite-' + pending; }
+    }
+    return;
+  }
   if (currentId !== 'profile' && currentId !== 'settings') {
     currentId = 'profile';
     history.replaceState(null, '', '#perfil');
@@ -203,7 +217,7 @@ async function init() {
     let hadSession = !!account.getSession();
     account.onAccount(({ session }) => {
       // Só redesenha quando a pessoa entra ou sai; as telas cuidam do resto
-      if (!!session !== hadSession) { hadSession = !!session; resetWorkouts(); resetBody(); resetHall(); render(); }
+      if (!!session !== hadSession) { hadSession = !!session; resetWorkouts(); resetBody(); resetHall(); resetParty(); render(); }
     });
   }
 

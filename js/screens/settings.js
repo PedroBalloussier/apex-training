@@ -8,6 +8,7 @@ import { formatDuration } from '../utils/units.js';
 import { getLanguage } from '../i18n/index.js';
 import { getUser, getProfile, signOut } from '../data/account.js';
 import { demoActive, exitDemo } from '../data/demo.js';
+import { exportWorkoutsCsv, exportBodyCsv } from '../data/export-csv.js';
 import { openDemoSheet } from '../ui/demo-ui.js';
 
 const REST_MIN = 30, REST_MAX = 300, REST_STEP = 15;
@@ -98,6 +99,9 @@ export default {
           <div class="settings-group">
             ${row('download', t('settings.export'), t('settings.exportHint'),
               `<button type="button" class="btn btn-sm" data-act="export">${icon('download')}${esc(t('settings.export'))}</button>`)}
+            ${row('download', t('csv.label'), t('csv.hint'),
+              `<div class="csv-btns"><button type="button" class="btn btn-sm" data-act="csv-workouts">${icon('download')}${esc(t('csv.workouts'))}</button>
+               <button type="button" class="btn btn-sm" data-act="csv-body">${icon('download')}${esc(t('csv.body'))}</button></div>`)}
             ${row('upload', t('settings.import'), t('settings.importHint'),
               `<label class="btn btn-sm">${icon('upload')}${esc(t('settings.import'))}<input type="file" accept="application/json,.json" data-act="import" class="sr-only"></label>`)}
             ${row('chart', t('demo.settingsLabel'), t('demo.settingsHint'),
@@ -111,6 +115,14 @@ export default {
         <p class="faint" style="text-align:center;font-size:13px">${esc(t('app.name'))} · ${esc(t('settings.version'))} ${esc(t('app.version'))}</p>
       </section>`;
 
+    const csvBtn = (sel, fn) => { const b = el.querySelector(sel); if (b) b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { const n = await fn(); toast(n ? t('csv.done', { n }) : t('csv.empty'), n ? 'download' : 'info'); }
+      catch (e) { toast(t('auth.errGeneric'), 'info'); }
+      b.disabled = false;
+    }); };
+    csvBtn('[data-act="csv-workouts"]', exportWorkoutsCsv);
+    csvBtn('[data-act="csv-body"]', exportBodyCsv);
     const dm = el.querySelector('[data-act="demo"]');
     if (dm) dm.addEventListener('click', openDemoSheet);
     const dx = el.querySelector('[data-act="demo-exit"]');

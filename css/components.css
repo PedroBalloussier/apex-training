@@ -671,3 +671,77 @@ input[type="date"].input { -webkit-appearance: none; appearance: none; width: 10
 .legend-quotes cite { font-style: normal; font-size: 12.5px; color: var(--text-3); }
 .quote .avatar { width: 44px; height: 44px; font-size: 15px; flex: none; }
 .legend-quote { border-color: color-mix(in srgb, var(--warning) 35%, var(--line)); }
+
+/* ---------- Party ---------- */
+.party-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.party-actions .btn { flex: 1; min-width: 160px; justify-content: center; }
+.party-list { display: grid; gap: 12px; }
+@media (min-width: 900px) { .party-list { grid-template-columns: 1fr 1fr; } }
+a.party-card { text-decoration: none; color: inherit; display: grid; gap: 14px; transition: border-color .18s; }
+a.party-card:hover { border-color: var(--line-2); }
+.party-card-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.party-card-head h3 { margin: 0 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.party-card-foot { display: flex; align-items: center; gap: 10px; }
+.av-stack { display: inline-flex; }
+.av-stack .avatar { margin-left: -8px; box-shadow: 0 0 0 2px var(--surface); }
+.av-stack .avatar:first-child { margin-left: 0; }
+.avatar.member-av { color: #0B0F14; }
+.avatar.sm { width: 34px; height: 34px; border-radius: 11px; font-size: 12.5px; }
+.avatar.xs { width: 26px; height: 26px; border-radius: 9px; font-size: 10.5px; }
+.rank-pill { min-width: 30px; height: 30px; padding: 0 8px; border-radius: 10px; display: inline-grid; place-items: center; font-weight: 800; font-size: 13px; background: var(--surface-3); color: var(--text-2); flex: none; }
+.rank-pill.r1 { background: linear-gradient(135deg, #FBBF24, #F59E0B); color: #1A1204; }
+.rank-pill.r2 { background: linear-gradient(135deg, #E5E7EB, #9CA3AF); color: #111827; }
+.rank-pill.r3 { background: linear-gradient(135deg, #F0A36B, #B45309); color: #1F0F02; }
+.rank-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rank-list li { display: flex; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 14px; }
+.rank-list li.me { background: color-mix(in srgb, var(--primary) 9%, transparent); }
+.rank-main { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.rank-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-name .tag { font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--text-3); font-weight: 600; margin-left: 4px; }
+.rank-bar { height: 6px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.rank-bar i { display: block; height: 100%; border-radius: 999px; }
+.rank-score { font-weight: 750; font-size: 16px; text-align: right; flex: none; display: grid; }
+.rank-score small { font-size: 11px; color: var(--text-3); font-weight: 600; }
+.taunts { display: grid; gap: 8px; }
+.taunt { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--warning) 30%, var(--line)); background: color-mix(in srgb, var(--warning) 7%, var(--surface)); font-size: 14px; }
+.taunt svg { width: 18px; height: 18px; color: var(--warning); flex: none; margin-top: 1px; }
+.feed { list-style: none; margin: 0; padding: 0; display: grid; }
+.feed li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.feed li:last-child { border-bottom: 0; }
+.feed-text { flex: 1; min-width: 0; }
+.feed-pts { color: var(--success); font-weight: 700; }
+.feed-day { color: var(--text-3); font-size: 12px; min-width: 48px; text-align: right; }
+.invite-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.invite-code { font-size: 28px; font-weight: 800; letter-spacing: .18em; padding: 8px 16px; border-radius: 14px; border: 1.5px dashed var(--line-2); background: var(--surface-2); }
+.invite-btns { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+.invite-btns .btn { flex: 1; justify-content: center; min-width: 130px; }
+.invite-hero { display: grid; justify-items: center; text-align: center; gap: 12px; padding: 28px 20px; }
+.invite-hero h1 { margin: 0; }
+.coach-avatar.big { width: 72px; height: 72px; border-radius: 22px; }
+.code-input { text-align: center; font-size: 24px; letter-spacing: .3em; font-weight: 800; text-transform: uppercase; }
+.party-hero h1 { margin: 2px 0 4px; }
+.party-hero .progress { margin-top: 12px; }
+.champion-card { border-color: color-mix(in srgb, var(--warning) 45%, var(--line)); background: linear-gradient(135deg, color-mix(in srgb, var(--warning) 14%, var(--surface)), var(--surface)); }
+.champ-row { display: flex; gap: 14px; align-items: center; margin-bottom: 12px; }
+.champ-row > svg { width: 40px; height: 40px; color: var(--warning); flex: none; }
+.champ-row h2 { margin: 2px 0; }
+.format-grid { display: grid; gap: 8px; }
+@media (min-width: 640px) { .format-grid { grid-template-columns: repeat(3, 1fr); } }
+.format-opt { text-align: left; display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text-2); cursor: pointer; font: inherit; }
+.format-opt strong { color: var(--text); font-size: 14.5px; }
+.format-opt span { font-size: 12.5px; }
+.format-opt[aria-pressed="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)); }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; cursor: pointer; }
+.toggle-row > span { display: grid; gap: 2px; }
+.toggle-row input { width: 22px; height: 22px; accent-color: var(--primary); flex: none; }
+.party-footer { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.danger-text { color: var(--danger); }
+.party-actions .btn { white-space: nowrap; }
+@media (max-width: 420px) { .party-actions { flex-direction: column; } .party-actions .btn { width: 100%; } }
+.pass-wrap { position: relative; }
+.pass-wrap .input { padding-right: 48px; }
+.pass-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 10px; border: 0; background: transparent; color: var(--text-3); display: grid; place-items: center; cursor: pointer; }
+.pass-toggle:hover { color: var(--text); background: var(--surface-3); }
+.pass-toggle svg { width: 19px; height: 19px; }
+.csv-btns { display: flex; gap: 8px; }
+.csv-btns .btn { flex: 1; justify-content: center; }

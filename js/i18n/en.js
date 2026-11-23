@@ -1,5 +1,5 @@
 export default {
-  app: { name: 'Apex', version: 'v0.6.5' },
+  app: { name: 'Apex', version: 'v0.7' },
   nav: {
     today: 'Today', plan: 'Plan', calendar: 'Calendar', dashboard: 'Progress',
     profile: 'Profile', triage: 'Assessment', session: 'Workout', exercise: 'Exercise', body: 'Body', report: 'Report', hall: 'Hall of Fame', party: 'Party', settings: 'Settings', more: 'More',
