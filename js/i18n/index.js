@@ -2,8 +2,20 @@ import pt1 from './pt.js';
 import en1 from './en.js';
 import pt2 from './pt2.js';
 import en2 from './en2.js';
+import pt3 from './pt3.js';
+import en3 from './en3.js';
 
-const DICTS = { pt: { ...pt1, ...pt2 }, en: { ...en1, ...en2 } };
+function merge(...parts) {
+  const out = {};
+  for (const part of parts) {
+    for (const [k, v] of Object.entries(part)) {
+      out[k] = v && typeof v === 'object' && !Array.isArray(v) && out[k] && typeof out[k] === 'object' ? merge(out[k], v) : v;
+    }
+  }
+  return out;
+}
+
+const DICTS = { pt: merge(pt1, pt2, pt3), en: merge(en1, en2, en3) };
 let lang = 'pt';
 
 export function setLanguage(l) {

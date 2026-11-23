@@ -6,6 +6,9 @@ import { getActivePlan, getProfile } from '../data/account.js';
 import { loadCatalog } from '../data/catalog.js';
 import { dayForDate, nextTraining } from '../engine/generator.js';
 import { cycleWeek, weekStrip, exerciseList } from './plan.js';
+import { loadWorkouts, getOpen, doneToday, workoutsThisWeek, streak } from '../data/workouts.js';
+import { startDay } from './start.js';
+import { formatDuration } from '../utils/units.js';
 
 function greeting() {
   const h = new Date().getHours();
@@ -27,7 +30,9 @@ export default {
     const profile = getProfile();
     const firstName = profile && profile.name ? profile.name.split(' ')[0] : '';
     const lang = getLanguage();
-    if (row) await loadCatalog();
+    if (row) await Promise.all([loadCatalog(), loadWorkouts()]);
+    const open = row ? getOpen() : null;
+    const finished = row ? doneToday() : null;
 
     let workoutCard;
     let cycleKpi = kpi(t('today.kpiCycle'), '—', t('today.kpiCycleSub'));
@@ -48,7 +53,27 @@ export default {
       cycleKpi = kpi(t('today.kpiCycle'), t('todayPlan.cycleValue', { n, w }), t('todayPlan.cycleSub'));
       const today = dayForDate(plan);
       const next = nextTraining(plan);
-      if (today) {
+      if (open) {
+        workoutCard = `
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="day-badge day-${esc(open.day_key)}">${esc(open.day_key)}</span>
+                <div><span class="eyebrow">${esc(t('session.inProgress'))}</span><h2>${esc(t('dayTypes.' + open.day_type))}</h2></div></div>
+            </div>
+            <p class="muted">${esc(t('session.inProgressText', { n: open.sets.filter((x) => x.done).length }))}</p>
+            <a class="btn btn-primary btn-block" href="#treino" style="margin-top:14px">${icon('dumbbell')}${esc(t('session.continue'))}</a>
+          </div>`;
+      } else if (finished) {
+        workoutCard = `
+          <div class="card">
+            <div class="empty" style="padding:20px 8px">
+              <div class="empty-icon">${icon('trophy')}</div>
+              <h3>${esc(t('session.doneToday', { k: finished.day_key }))}</h3>
+              <p>${esc(t('session.doneTodayText', { d: formatDuration(Math.max(60, finished.duration_sec - (finished.duration_sec % 60)), lang) }))}</p>
+              ${next ? `<p class="setting-hint">${esc(t('todayPlan.next'))}: ${esc(t('dayTypes.' + next.day.type))} · ${esc(tl('weekdaysLong')[next.date.getDay()])}</p>` : ''}
+            </div>
+          </div>`;
+      } else if (today) {
         workoutCard = `
           <div class="card">
             <div class="card-head">
@@ -80,8 +105,8 @@ export default {
         </header>
 
         <div class="kpis">
-          ${kpi(t('today.kpiStreak'), '0', t('today.kpiStreakSub'))}
-          ${kpi(t('today.kpiWeek'), '0', t('today.kpiWeekSub'))}
+          ${kpi(t('today.kpiStreak'), row ? String(streak(row.data.schedule)) : '0', t('today.kpiStreakSub'))}
+          ${kpi(t('today.kpiWeek'), row ? `${workoutsThisWeek()}/${row.data.daysPerWeek}` : '0', t('today.kpiWeekSub'))}
           ${cycleKpi}
         </div>
 
@@ -116,6 +141,6 @@ export default {
       </section>`;
 
     const start = el.querySelector('[data-start]');
-    if (start) start.addEventListener('click', () => toast(t('toast.soon'), 'info'));
+    if (start) start.addEventListener('click', () => startDay(dayForDate(row.data)));
   }
 };

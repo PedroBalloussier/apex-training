@@ -8,6 +8,9 @@ import settingsScreen from './screens/settings.js';
 import planScreen from './screens/plan.js';
 import profileScreen from './screens/profile.js';
 import triageScreen from './screens/triage.js';
+import sessionScreen from './screens/session.js';
+import { quickStart } from './screens/start.js';
+import { resetWorkouts } from './data/workouts.js';
 import { soonScreen } from './screens/soon.js';
 
 // Rotas: o hash é o nome em português (sem "settings", reservado em alguns ambientes)
@@ -20,7 +23,8 @@ const ROUTES = [
   { id: 'party', hash: 'party', ic: 'users', screen: soonScreen({ key: 'party', ic: 'users', stage: 7 }), group: 'social' },
   { id: 'settings', hash: 'config', ic: 'gear', screen: settingsScreen, group: 'bottom' },
   { id: 'profile', hash: 'perfil', ic: 'users', screen: profileScreen, hidden: true },
-  { id: 'triage', hash: 'triagem', ic: 'sparkle', screen: triageScreen, hidden: true }
+  { id: 'triage', hash: 'triagem', ic: 'sparkle', screen: triageScreen, hidden: true },
+  { id: 'session', hash: 'treino', ic: 'dumbbell', screen: sessionScreen, hidden: true }
 ];
 
 const app = document.getElementById('app');
@@ -82,7 +86,7 @@ function renderShell() {
   app.querySelector('[data-act="theme"]').addEventListener('click', () => {
     updateSettings({ mode: getSettings().mode === 'light' ? 'dark' : 'light' });
   });
-  app.querySelector('[data-act="log"]').addEventListener('click', () => toast(t('toast.soon'), 'info'));
+  app.querySelector('[data-act="log"]').addEventListener('click', () => quickStart());
   app.querySelector('[data-act="collapse"]').addEventListener('click', () => {
     updateSettings({ sidebarCollapsed: !getSettings().sidebarCollapsed });
   });
@@ -175,7 +179,7 @@ async function init() {
     let hadSession = !!account.getSession();
     account.onAccount(({ session }) => {
       // Só redesenha quando a pessoa entra ou sai; as telas cuidam do resto
-      if (!!session !== hadSession) { hadSession = !!session; render(); }
+      if (!!session !== hadSession) { hadSession = !!session; resetWorkouts(); render(); }
     });
   }
 

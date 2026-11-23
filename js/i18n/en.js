@@ -1,8 +1,8 @@
 export default {
-  app: { name: 'Apex', version: 'v0.2' },
+  app: { name: 'Apex', version: 'v0.3' },
   nav: {
     today: 'Today', plan: 'Plan', calendar: 'Calendar', dashboard: 'Progress',
-    profile: 'Profile', triage: 'Assessment', hall: 'Hall of Fame', party: 'Party', settings: 'Settings', more: 'More',
+    profile: 'Profile', triage: 'Assessment', session: 'Workout', hall: 'Hall of Fame', party: 'Party', settings: 'Settings', more: 'More',
     collapse: 'Collapse menu', expand: 'Expand menu'
   },
   top: {

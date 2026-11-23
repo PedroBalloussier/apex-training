@@ -87,6 +87,14 @@ export async function activatePlan(plan, triageId) {
   return data;
 }
 
+/** Atualiza o conteúdo do plano ativo (trocas de exercício, bi-sets, ordem). */
+export async function updateActivePlanData(data) {
+  const { data: row, error } = await supabase.from('plans').update({ data }).eq('id', activePlan.id).select().single();
+  if (error) throw error;
+  activePlan = row;
+  return row;
+}
+
 export async function lastTriage() {
   const { data } = await supabase.from('triages').select('answers, created_at')
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
