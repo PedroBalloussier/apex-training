@@ -1,0 +1,113 @@
+/* Tokens de tema — base: Apex v1.2.2. Nenhum componente usa cor fixa. */
+:root,
+[data-theme="dark"] {
+  --bg: #0B0F14;
+  --bg-2: #0E141B;
+  --surface: #161B22;
+  --surface-2: #1C232C;
+  --surface-3: #232C37;
+  --primary: #14B8A6;
+  --accent: #34D399;
+  --on-primary: #04211E;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --text: #F8FAFC;
+  --text-2: #9DACBF;
+  --text-3: #7A8798;
+  --line: rgba(255,255,255,.08);
+  --line-2: rgba(255,255,255,.14);
+  --grid: rgba(255,255,255,.06);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.35);
+  --primary-grad: linear-gradient(135deg, var(--primary), var(--accent));
+  --ambient-a: .62;
+  --ambient-b: .50;
+  --surface-rgb: 22,27,34;
+  --bg-rgb: 11,15,20;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #F8FAFC;
+  --bg-2: #F1F5F9;
+  --surface: #FFFFFF;
+  --surface-2: #F1F5F9;
+  --surface-3: #E2E8F0;
+  --primary: #0F766E;
+  --accent: #10B981;
+  --on-primary: #FFFFFF;
+  --text: #111827;
+  --text-2: #475569;
+  --text-3: #64748B;
+  --line: rgba(15,23,42,.08);
+  --line-2: rgba(15,23,42,.16);
+  --grid: rgba(15,23,42,.06);
+  --shadow: 0 1px 2px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.07);
+  --ambient-a: .30;
+  --ambient-b: .24;
+  --surface-rgb: 255,255,255;
+  --bg-rgb: 248,250,252;
+  color-scheme: light;
+}
+
+[data-theme="sunset"] {
+  --bg: #17110E;
+  --bg-2: #1D1612;
+  --surface: #241B16;
+  --surface-2: #2C221C;
+  --surface-3: #352922;
+  --primary: #E2622C;
+  --accent: #F0745A;
+  --on-primary: #2A0F04;
+  --text: #FBF1E9;
+  --text-2: #C9B5A6;
+  --text-3: #9C887A;
+  --line: rgba(255,235,220,.08);
+  --line-2: rgba(255,235,220,.15);
+  --grid: rgba(255,235,220,.06);
+  --shadow: 0 1px 2px rgba(0,0,0,.45), 0 8px 28px rgba(0,0,0,.38);
+  --ambient-a: .55;
+  --ambient-b: .42;
+  --surface-rgb: 36,27,22;
+  --bg-rgb: 23,17,14;
+  color-scheme: dark;
+}
+
+[data-theme="sunset-light"] {
+  --bg: #FDF8F4;
+  --bg-2: #F8EFE8;
+  --surface: #FFFFFF;
+  --surface-2: #F8EFE8;
+  --surface-3: #EFE1D6;
+  --primary: #C2410C;
+  --accent: #E0603F;
+  --on-primary: #FFFFFF;
+  --text: #2A1A12;
+  --text-2: #6B4F40;
+  --text-3: #8A6E5E;
+  --line: rgba(60,30,15,.09);
+  --line-2: rgba(60,30,15,.17);
+  --grid: rgba(60,30,15,.06);
+  --shadow: 0 1px 2px rgba(60,30,15,.06), 0 8px 24px rgba(60,30,15,.08);
+  --ambient-a: .28;
+  --ambient-b: .22;
+  --surface-rgb: 255,255,255;
+  --bg-rgb: 253,248,244;
+  color-scheme: light;
+}
+
+/* Cores de gráfico por dia de treino (fixas por design) */
+:root {
+  --day-a: #F472B6; --day-b: #818CF8; --day-c: #FBBF24;
+  --day-d: #38BDF8; --day-e: #34D399; --day-f: #F87171; --day-x: #C084FC;
+  --radius-card: 22px;
+  --radius-kpi: 20px;
+  --radius-sheet: 26px;
+  --radius-btn: 14px;
+  --radius-btn-sm: 11px;
+  --topbar-h: 56px;
+  --tabbar-h: 64px;
+  --side-w: 230px;
+  --side-w-collapsed: 74px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
