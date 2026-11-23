@@ -76,7 +76,7 @@ export default {
     const exChart = exSess.length >= 2 ? lineChart(exSess.map((s) => ({
       label: new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit' }).format(new Date(s.date)),
       value: weightToUser(s.best, unit)
-)), { format: (v) => `${v.toLocaleString(lang === 'en' ? 'en-US' : 'pt-BR')} ${unit}` }) : `<p class="muted">${esc(t('dash.needTwo'))}</p>`;
+    })), { format: (v) => `${v.toLocaleString(lang === 'en' ? 'en-US' : 'pt-BR')} ${unit}` }) : `<p class="muted">${esc(t('dash.needTwo'))}</p>`;
 
     const lastW = [...body].reverse().find((r) => r.weight_kg != null);
     const firstW = body.find((r) => r.weight_kg != null);
