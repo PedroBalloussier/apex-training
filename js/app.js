@@ -220,8 +220,9 @@ async function init() {
       navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
       // Quando uma versão nova assume, recarrega uma vez para usar os arquivos novos
       let reloaded = false;
+      const hadController = !!navigator.serviceWorker.controller;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (reloaded || !navigator.serviceWorker.controller) return;
+        if (reloaded || !hadController || document.querySelector('input:focus')) return;
         reloaded = true;
         if (!document.querySelector('.sheet') && !location.hash.startsWith('#treino')) location.reload();
       });
