@@ -119,6 +119,7 @@ function renderStep(el) {
       <div class="wizard-q">
         <h1>${esc(t(`triage.${step}.q`))}</h1>
         ${HINTS[step] ? `<p class="muted">${esc(t(HINTS[step]))}</p>` : ''}
+        ${step === 'level' && state.levelHint ? `<div class="sug up">${icon('trophy')}<span>${esc(t('report.levelHint', { level: t('triage.level.' + state.levelHint) }))}</span></div>` : ''}
       </div>
       <div data-body>${stepBody(step, a)}</div>
       <div class="wizard-actions">
@@ -227,6 +228,11 @@ export default {
         const last = await lastTriage();
         if (last && last.answers) state.answers = { ...structuredClone(DEFAULTS), ...last.answers };
       } catch (e) { /* segue com os padrões */ }
+      try {
+        const hint = sessionStorage.getItem('apex:levelHint');
+        sessionStorage.removeItem('apex:levelHint');
+        if (hint) { state.answers.level = hint; state.levelHint = hint; }
+      } catch (e) { /* sem sessionStorage */ }
     }
     if (state.view === 'results' && state.plans) renderResults(el);
     else renderStep(el);

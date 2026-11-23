@@ -9,6 +9,8 @@ import { cycleWeek, weekStrip, exerciseList } from './plan.js';
 import { loadWorkouts, getOpen, doneToday, workoutsThisWeek, streak } from '../data/workouts.js';
 import { startDay } from './start.js';
 import { formatDuration } from '../utils/units.js';
+import { cycleCard } from './dashboard.js';
+import { cycleInfo } from '../data/stats.js';
 
 function greeting() {
   const h = new Date().getHours();
@@ -109,6 +111,8 @@ export default {
           ${kpi(t('today.kpiWeek'), row ? `${workoutsThisWeek()}/${row.data.daysPerWeek}` : '0', t('today.kpiWeekSub'))}
           ${cycleKpi}
         </div>
+
+        ${row && cycleInfo(row).daysLeft <= 7 ? cycleCard(row, lang, { compact: true }) : ''}
 
         ${workoutCard}
 

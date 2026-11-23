@@ -1,0 +1,56 @@
+// Textos da etapa 5 (progresso, corpo, relatório) — português
+export default {
+  dash: {
+    title: 'Seu progresso', cycle: 'Ciclo atual', daysLeft: 'faltam {n} dias', ended: 'ciclo concluído',
+    nearText: 'Seu ciclo está acabando. Veja o relatório e prepare a próxima triagem.',
+    endedText: 'Ciclo concluído! Veja seu relatório e faça a nova triagem.',
+    seeReport: 'Ver relatório do ciclo', partialReport: 'Relatório parcial',
+    noPlanText: 'Faça a triagem e comece a treinar para ver sua evolução aqui.',
+    workouts: 'Treinos', inCycle: 'neste ciclo', adherence: 'Aderência', ofPlanned: 'de {n} previstos',
+    volume: 'Volume', improved: 'Evoluções', exercises: 'exercícios com mais carga',
+    consistency: 'Consistência', weeks16: 'últimas 16 semanas', less: 'menos', more: 'mais',
+    weeklyGoal: 'Meta semanal', goalHits: '{n}/{t} semanas na meta', goalLine: 'Linha tracejada: meta de {n} treinos por semana.',
+    byMuscle: 'Séries por grupo', last28: 'últimos 28 dias', setsN: '{n} séries',
+    exerciseProgress: 'Evolução por exercício', details: 'Detalhes', needTwo: 'Registre pelo menos duas sessões para ver o gráfico.',
+    topGains: 'Maiores evoluções do ciclo', noGains: 'As evoluções aparecem a partir da segunda sessão de cada exercício.',
+    update: 'Atualizar', noBody: 'Registre seu peso e medidas para acompanhar a evolução do corpo.',
+    noData: 'Ainda sem dados. Registre seus treinos.'
+  },
+  body: {
+    title: 'Corpo', subtitle: 'Peso e medidas ao longo do tempo. Meça sempre no mesmo horário, de preferência pela manhã.',
+    weight_kg: 'Peso', body_fat_pct: '% de gordura', waist_cm: 'Cintura', chest_cm: 'Peito', arm_cm: 'Braço', thigh_cm: 'Coxa', hip_cm: 'Quadril',
+    add: 'Registrar medidas', date: 'Data', save: 'Salvar medidas', saved: 'Medidas salvas',
+    hint: 'Preencha só o que quiser. Uma medida por dia: salvar de novo no mesmo dia atualiza o registro.',
+    history: 'Histórico', delete: 'Apagar', deleteTitle: 'Apagar este registro?', deleteText: 'As medidas deste dia serão removidas.',
+    errEmpty: 'Preencha pelo menos uma medida.', errRange: 'Algum valor está fora do intervalo esperado. Confira e tente de novo.',
+    sinceStart: 'desde o início', noData: 'sem registros', noChange: 'sem mudança', since: 'antes:', firstEntry: 'primeiro registro'
+  },
+  report: {
+    eyebrow: 'Relatório do ciclo', title: 'Relatório do ciclo', partial: 'parcial',
+    highlights: 'Destaques', hlTitleName: 'Destaques, {name}',
+    hlConsistency: 'Consistência de {p}%: você treinou {d} de {s} dias previstos.',
+    hlConsistencyMid: 'Aderência de {p}%. Bom ritmo, e dá para subir no próximo ciclo.',
+    hlConsistencyLow: 'Aderência de {p}%. No próximo ciclo, vale escolher menos dias e cumprir todos.',
+    hlStrength: 'Maior evolução: {ex}, de {a} para {b} (+{p}%).',
+    hlReps: 'Maior evolução: {ex}, de {a} para {b} repetições.',
+    hlImproved: 'Você aumentou a carga em {n} exercícios.',
+    hlVolume: 'Seu volume subiu {p}% do início para o fim do ciclo.',
+    hlStreak: 'Maior sequência: {n} treinos seguidos sem faltar.',
+    hlWeightDown: 'Peso: −{v} no ciclo.', hlWeightUp: 'Peso: +{v} no ciclo.',
+    hlWaist: 'Cintura: −{v}.',
+    hlEmpty: 'Registre seus treinos para que os destaques apareçam aqui.',
+    ofScheduled: 'de {n} previstos', bestStreak: 'maior sequência: {n}', sets: '{n} séries',
+    strength: 'Força: início × fim', exercise: 'Exercício', start: 'Início', end: 'Fim', change: 'Mudança',
+    noStrength: 'Faça pelo menos duas sessões de um exercício para comparar.',
+    body: 'Corpo no ciclo', noBody: 'Registre medidas no início e no fim do ciclo para comparar.',
+    weekly: 'Treinos por semana',
+    shareImage: 'Compartilhar imagem', pdf: 'Salvar em PDF', imageSaved: 'Imagem salva',
+    nextTitle: 'Próximo ciclo',
+    nextEnded: 'Seu ciclo terminou. Faça a nova triagem: ela já vem preenchida e considera o seu desempenho.',
+    nextEarly: 'Quer mudar de treino antes do fim? A nova triagem arquiva o plano atual e guarda este relatório.',
+    levelHint: 'Pelo seu desempenho, sugerimos o nível {level} no próximo plano.',
+    newTriage: 'Fazer nova triagem', endEarly: 'Encerrar ciclo e fazer nova triagem',
+    endEarlyTitle: 'Encerrar o ciclo agora?', endEarlyText: 'O plano atual será arquivado quando você escolher o novo. O relatório deste ciclo continua disponível.',
+    pastCycles: 'Ciclos anteriores'
+  }
+};

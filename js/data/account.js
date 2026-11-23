@@ -95,6 +95,18 @@ export async function updateActivePlanData(data) {
   return row;
 }
 
+/** Todos os planos (ciclos), do mais recente ao mais antigo. */
+export async function listPlans() {
+  const { data } = await supabase.from('plans').select('*').order('started_at', { ascending: false }).limit(50);
+  return data || [];
+}
+
+export async function getPlan(id) {
+  if (activePlan && activePlan.id === id) return activePlan;
+  const { data } = await supabase.from('plans').select('*').eq('id', id).maybeSingle();
+  return data;
+}
+
 export async function lastTriage() {
   const { data } = await supabase.from('triages').select('answers, created_at')
     .order('created_at', { ascending: false }).limit(1).maybeSingle();

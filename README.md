@@ -2,7 +2,7 @@
 
 App de treino: plano montado pela triagem, troca de exercícios por equivalentes, registro de séries, progresso, Hall da Fama e Party entre amigos.
 
-Nome de trabalho. Versão atual: **v0.4 (etapa 4: página do exercício e calendário)**.
+Nome de trabalho. Versão atual: **v0.5 (etapa 5: progresso, corpo, ciclo e relatório)**.
 
 ## Estrutura
 
@@ -21,6 +21,7 @@ js/engine/          motor que gera os planos a partir da triagem
 data/exercises.json catálogo (166 exercícios com etiquetas de equivalência)
 supabase/schema.sql tabelas e regras de acesso do banco (etapa 2)
 supabase/schema_etapa3.sql treinos e séries (etapa 3)
+supabase/schema_etapa5.sql medidas corporais (etapa 5)
 tools/              script que gera o catálogo
 js/data/settings.js configurações do usuário
 js/utils/units.js   conversão kg/lb e cm/in (armazenamento interno em kg e cm)
@@ -45,7 +46,7 @@ Abra http://localhost:8000.
 2. Cadastro, triagem, catálogo de exercícios e geração de planos (feito)
 3. Hoje, Plano e Sessão (feito)
 4. Exercício e Calendário (feito)
-5. Dashboard, corpo, ciclo, relatório e nova triagem
+5. Dashboard, corpo, ciclo, relatório e nova triagem (feito)
 6. Hall da Fama e banco de frases
 7. Party
 8. Verificação completa

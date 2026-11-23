@@ -12,6 +12,10 @@ import sessionScreen from './screens/session.js';
 import { quickStart } from './screens/start.js';
 import calendarScreen from './screens/calendar.js';
 import exerciseScreen from './screens/exercise.js';
+import dashboardScreen from './screens/dashboard.js';
+import bodyScreen from './screens/body.js';
+import reportScreen from './screens/report.js';
+import { resetBody } from './data/body.js';
 import { resetWorkouts } from './data/workouts.js';
 import { soonScreen } from './screens/soon.js';
 
@@ -20,14 +24,17 @@ const ROUTES = [
   { id: 'today', hash: 'hoje', ic: 'home', screen: today, tab: true },
   { id: 'plan', hash: 'plano', ic: 'plan', screen: planScreen, tab: true },
   { id: 'calendar', hash: 'calendario', ic: 'calendar', screen: calendarScreen, tab: true },
-  { id: 'dashboard', hash: 'progresso', ic: 'chart', screen: soonScreen({ key: 'dashboard', ic: 'chart', stage: 5 }), tab: true },
+  { id: 'dashboard', hash: 'progresso', ic: 'chart', screen: dashboardScreen, tab: true },
+  { id: 'body', hash: 'corpo', ic: 'scale', screen: bodyScreen, group: 'progress' },
   { id: 'hall', hash: 'hall', ic: 'trophy', screen: soonScreen({ key: 'hall', ic: 'trophy', stage: 6 }), group: 'social' },
   { id: 'party', hash: 'party', ic: 'users', screen: soonScreen({ key: 'party', ic: 'users', stage: 7 }), group: 'social' },
   { id: 'settings', hash: 'config', ic: 'gear', screen: settingsScreen, group: 'bottom' },
   { id: 'profile', hash: 'perfil', ic: 'users', screen: profileScreen, hidden: true },
   { id: 'triage', hash: 'triagem', ic: 'sparkle', screen: triageScreen, hidden: true },
   { id: 'session', hash: 'treino', ic: 'dumbbell', screen: sessionScreen, hidden: true },
-  { id: 'exercise', hash: 'ex-', prefix: true, ic: 'dumbbell', screen: exerciseScreen, hidden: true }
+  { id: 'exercise', hash: 'ex-', prefix: true, ic: 'dumbbell', screen: exerciseScreen, hidden: true },
+  { id: 'report', hash: 'relatorio', ic: 'chart', screen: reportScreen, hidden: true },
+  { id: 'report', hash: 'rel-', prefix: true, ic: 'chart', screen: reportScreen, hidden: true }
 ];
 
 const app = document.getElementById('app');
@@ -73,7 +80,7 @@ function renderShell() {
     </header>
 
     <nav class="sidebar" aria-label="Menu">
-      ${ROUTES.filter((r) => r.tab).map((r) => navLink(r)).join('')}
+      ${ROUTES.filter((r) => r.tab || r.group === 'progress').map((r) => navLink(r)).join('')}
       <div class="nav-sep"></div>
       ${ROUTES.filter((r) => r.group === 'social').map((r) => navLink(r)).join('')}
       <div class="spacer"></div>
@@ -188,7 +195,7 @@ async function init() {
     let hadSession = !!account.getSession();
     account.onAccount(({ session }) => {
       // Só redesenha quando a pessoa entra ou sai; as telas cuidam do resto
-      if (!!session !== hadSession) { hadSession = !!session; resetWorkouts(); render(); }
+      if (!!session !== hadSession) { hadSession = !!session; resetWorkouts(); resetBody(); render(); }
     });
   }
 

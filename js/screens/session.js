@@ -333,15 +333,16 @@ function openFinish(el) {
         <button type="button" class="btn btn-primary" data-ok>${icon('check')}${esc(t('session.finishConfirm'))}</button>
       </div>`,
     onMount(sheet, close) {
-      sheet.querySelector('[data-ok]').addEventListener('click', async (e) => {
-        e.currentTarget.disabled = true;
+      const okBtn = sheet.querySelector('[data-ok]');
+      okBtn.addEventListener('click', async () => {
+        okBtn.disabled = true;
         try {
           await finishWorkout();
           stopRest(); close(); ctx = null;
           toast(t('session.finished'), 'trophy');
           location.hash = '#hoje';
         } catch (err) {
-          e.currentTarget.disabled = false;
+          okBtn.disabled = false;
           toast(t('session.saveFail'), 'info');
         }
       });
