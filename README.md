@@ -22,7 +22,8 @@ data/exercises.json catálogo (166 exercícios com etiquetas de equivalência)
 supabase/schema.sql tabelas e regras de acesso do banco (etapa 2)
 supabase/schema_etapa3.sql treinos e séries (etapa 3)
 supabase/schema_etapa5.sql medidas corporais (etapa 5)
-tools/              script que gera o catálogo
+tools/              scripts que geram o catálogo e o arquivo de demonstração
+data/demo-apex.json dados simulados para o modo demonstração
 js/data/settings.js configurações do usuário
 js/utils/units.js   conversão kg/lb e cm/in (armazenamento interno em kg e cm)
 js/ui/              ícones, toasts e sheets

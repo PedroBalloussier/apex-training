@@ -25,6 +25,14 @@ export default {
     errEmpty: 'Preencha pelo menos uma medida.', errRange: 'Algum valor está fora do intervalo esperado. Confira e tente de novo.',
     sinceStart: 'desde o início', noData: 'sem registros', noChange: 'sem mudança', since: 'antes:', firstEntry: 'primeiro registro'
   },
+  demo: {
+    explore: 'Explorar com dados de demonstração', title: 'Modo demonstração',
+    text: 'Veja o app funcionando com 2 ciclos de treinos simulados. Nada é salvo na sua conta: os dados ficam só neste aparelho.',
+    sample: 'Usar exemplo pronto', import: 'Importar arquivo JSON', importHint: 'Arquivo de demonstração do Apex (demo-apex.json)',
+    invalid: 'Arquivo inválido. Use o arquivo de demonstração do Apex.', bar: 'Modo demonstração: dados simulados, nada é salvo na sua conta.',
+    exit: 'Sair da demonstração', settingsLabel: 'Dados de demonstração', settingsHint: 'Explore o app com treinos simulados, sem mexer na sua conta',
+    loadFail: 'Não foi possível carregar o exemplo. Tente importar o arquivo.'
+  },
   report: {
     eyebrow: 'Relatório do ciclo', title: 'Relatório do ciclo', partial: 'parcial',
     highlights: 'Destaques', hlTitleName: 'Destaques, {name}',

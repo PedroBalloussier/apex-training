@@ -25,6 +25,14 @@ export default {
     errEmpty: 'Fill in at least one measurement.', errRange: 'A value is outside the expected range. Check and try again.',
     sinceStart: 'since the start', noData: 'no entries', noChange: 'no change', since: 'before:', firstEntry: 'first entry'
   },
+  demo: {
+    explore: 'Explore with demo data', title: 'Demo mode',
+    text: "See the app in action with 2 simulated training cycles. Nothing is saved to your account: the data stays on this device only.",
+    sample: 'Use built-in sample', import: 'Import JSON file', importHint: 'Apex demo file (demo-apex.json)',
+    invalid: 'Invalid file. Use the Apex demo file.', bar: 'Demo mode: simulated data, nothing is saved to your account.',
+    exit: 'Exit demo', settingsLabel: 'Demo data', settingsHint: 'Explore the app with simulated workouts, without touching your account',
+    loadFail: "Couldn't load the sample. Try importing the file."
+  },
   report: {
     eyebrow: 'Cycle report', title: 'Cycle report', partial: 'partial',
     highlights: 'Highlights', hlTitleName: 'Highlights, {name}',

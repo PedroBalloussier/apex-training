@@ -16,6 +16,8 @@ import dashboardScreen from './screens/dashboard.js';
 import bodyScreen from './screens/body.js';
 import reportScreen from './screens/report.js';
 import { resetBody } from './data/body.js';
+import { demoBar, bindDemoBar } from './ui/demo-ui.js';
+import { demoActive } from './data/demo.js';
 import { resetWorkouts } from './data/workouts.js';
 import { soonScreen } from './screens/soon.js';
 
@@ -90,6 +92,7 @@ function renderShell() {
       </button>
     </nav>
 
+    ${demoBar()}
     <main class="main" id="main"></main>
 
     <nav class="tabbar" aria-label="Menu">
@@ -105,6 +108,8 @@ function renderShell() {
     updateSettings({ sidebarCollapsed: !getSettings().sidebarCollapsed });
   });
   app.querySelector('[data-act="more"]').addEventListener('click', openMore);
+  bindDemoBar(app);
+  document.body.classList.toggle('demo', demoActive());
 }
 
 function openMore() {

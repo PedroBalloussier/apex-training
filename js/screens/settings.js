@@ -7,6 +7,8 @@ import { toast, openSheet } from '../ui/feedback.js';
 import { formatDuration } from '../utils/units.js';
 import { getLanguage } from '../i18n/index.js';
 import { getUser, getProfile, signOut } from '../data/account.js';
+import { demoActive, exitDemo } from '../data/demo.js';
+import { openDemoSheet } from '../ui/demo-ui.js';
 
 const REST_MIN = 30, REST_MAX = 300, REST_STEP = 15;
 
@@ -95,6 +97,9 @@ export default {
               `<button type="button" class="btn btn-sm" data-act="export">${icon('download')}${esc(t('settings.export'))}</button>`)}
             ${row('upload', t('settings.import'), t('settings.importHint'),
               `<label class="btn btn-sm">${icon('upload')}${esc(t('settings.import'))}<input type="file" accept="application/json,.json" data-act="import" class="sr-only"></label>`)}
+            ${row('chart', t('demo.settingsLabel'), t('demo.settingsHint'),
+              demoActive() ? `<button type="button" class="btn btn-sm" data-act="demo-exit">${esc(t('demo.exit'))}</button>`
+                : `<button type="button" class="btn btn-sm" data-act="demo">${icon('upload')}${esc(t('demo.import'))}</button>`)}
             ${row('trash', t('settings.reset'), t('settings.resetHint'),
               `<button type="button" class="btn btn-sm btn-danger" data-act="reset">${icon('trash')}${esc(t('settings.reset'))}</button>`)}
           </div>
@@ -103,6 +108,10 @@ export default {
         <p class="faint" style="text-align:center;font-size:13px">${esc(t('app.name'))} · ${esc(t('settings.version'))} ${esc(t('app.version'))}</p>
       </section>`;
 
+    const dm = el.querySelector('[data-act="demo"]');
+    if (dm) dm.addEventListener('click', openDemoSheet);
+    const dx = el.querySelector('[data-act="demo-exit"]');
+    if (dx) dx.addEventListener('click', () => exitDemo());
     const so = el.querySelector('[data-act="signout"]');
     if (so) so.addEventListener('click', () => signOut());
 

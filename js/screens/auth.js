@@ -3,6 +3,7 @@ import { icon } from '../ui/icons.js';
 import { esc } from '../utils/dom.js';
 import { signIn, signUp, errorKey } from '../data/account.js';
 import { getSettings, updateSettings } from '../data/settings.js';
+import { openDemoSheet } from '../ui/demo-ui.js';
 
 let mode = 'signin';
 
@@ -42,10 +43,12 @@ export function renderAuth(root) {
             ${mode === 'signin' ? `<p class="form-note">${esc(t('auth.forgot'))}</p>` : ''}
           </form>
         </div>
+        <button type="button" class="btn btn-ghost btn-block" data-demo>${icon('chart')}${esc(t('demo.explore'))}</button>
       </div>
     </div>`;
 
   root.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => updateSettings({ language: b.dataset.lang })));
+  root.querySelector('[data-demo]').addEventListener('click', openDemoSheet);
   root.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => { mode = b.dataset.mode; renderAuth(root); }));
 
   const form = root.querySelector('form');
