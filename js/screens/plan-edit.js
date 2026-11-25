@@ -5,6 +5,7 @@ import { esc } from '../utils/dom.js';
 import { toast, openSheet } from '../ui/feedback.js';
 import { getActivePlan, updateActivePlanData, lastTriage } from '../data/account.js';
 import { getBuilderPlan, setBuilderDay, builderAnswers } from './builder.js';
+import { dayMap } from './plan.js';
 import { loadCatalog, getExercise, exerciseName, musclesLine } from '../data/catalog.js';
 import { EDIT_MUSCLES, fillDay, computeFocus, typeForMuscles, defaultPrescription, weekWarnings, equipmentFor } from '../engine/generator.js';
 import { dayLabel, dayTitle } from '../data/labels.js';
@@ -134,6 +135,7 @@ async function render(el, routeKey) {
         <div class="card-head"><span class="eyebrow">${esc(t('edit.exercises'))}</span>
           <span class="chip num">${esc(t('results.exercises', { n: d.exercises.length }))} · ${totalSets} ${esc(t('plan.sets'))}</span></div>
         <div class="diff-row">${diffBadge(difficultyOf(d.exercises), { label: true })}</div>
+        ${dayMap(d)}
         <ol class="edit-list">${d.exercises.map((x, i) => {
           const gs = groupSize(d.exercises, i);
           const first = gs && (i === 0 || d.exercises[i - 1].group !== x.group);

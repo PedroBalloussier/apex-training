@@ -9,6 +9,7 @@ import { videoFor, youtubeSearchUrl } from '../data/videos.js';
 import { exerciseHistory } from '../data/workouts.js';
 import { countable, setText } from '../data/techniques.js';
 import { formatWeight, weightToUser } from '../utils/units.js';
+import { bodyMap, areasOf } from '../ui/bodymap.js';
 
 export const exerciseHash = (id) => `#ex-${id}`;
 
@@ -80,11 +81,15 @@ export default {
         ${ex.primary ? `
         <div class="card muscles-card">
           <div class="card-head"><div class="card-title">${icon('dumbbell')}<h2>${esc(t('exercise.musclesWorked'))}</h2></div></div>
+          <div class="muscles-layout">
+          <figure class="bm-fig">${bodyMap(areasOf(ex), { label: t('bodymap.label'), labels: [t('bodymap.front'), t('bodymap.back')] })}
+            <figcaption class="bm-legend"><span><i class="k-p"></i>${esc(t('exercise.primary'))}</span><span><i class="k-s"></i>${esc(t('exercise.secondary'))}</span></figcaption></figure>
           <div class="muscle-groups">
             <div><span class="eyebrow">${esc(t('exercise.primary'))}</span>
               <div class="chips">${ex.primary.map((a) => `<span class="chip chip-strong">${esc(t('areas.' + a))}</span>`).join('')}</div></div>
             ${ex.secondary && ex.secondary.length ? `<div><span class="eyebrow">${esc(t('exercise.secondary'))}</span>
               <div class="chips">${ex.secondary.map((a) => `<span class="chip">${esc(t('areas.' + a))}</span>`).join('')}</div></div>` : ''}
+          </div>
           </div>
           <p class="setting-hint" style="margin-top:10px">${esc(t('exercise.musclesHint'))}</p>
         </div>` : ''}

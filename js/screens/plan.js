@@ -10,6 +10,8 @@ import { loadCatalog, getExercise, exerciseName, musclesLine } from '../data/cat
 import { plannedText, groupSize, groupName } from '../data/techniques.js';
 import { weekWarnings, dayOnWeekday, dayAtSlot, EDIT_MUSCLES, fillDay, typeForMuscles, computeFocus } from '../engine/generator.js';
 import { startBuilder } from './builder.js';
+import { gridOn, setGrid } from './print-plan.js';
+import { bodyMap, areasOf, mergeAreas } from '../ui/bodymap.js';
 import { lastTriage } from '../data/account.js';
 import { warningText } from './plan-edit.js';
 import { formatDuration } from '../utils/units.js';
@@ -38,6 +40,15 @@ export function weekStrip(plan) {
       ${day ? `<span class="dot day-${day.key}">${day.key}</span>` : `<span class="dot rest">${icon('minus')}</span>`}
     </div>`;
   }).join('')}</div>`;
+}
+
+/** Mapa dos músculos do dia (recolhível). */
+export function dayMap(day) {
+  const a = mergeAreas(day.exercises.map((x) => areasOf(getExercise(x.id))));
+  if (!a.primary.length && !a.secondary.length) return '';
+  return `<details class="day-map"><summary>${icon('dumbbell')}<span>${esc(t('bodymap.dayMap'))}</span>${icon('chevron')}</summary>
+    <figure class="bm-fig">${bodyMap(a, { label: t('bodymap.label'), labels: [t('bodymap.front'), t('bodymap.back')] })}
+    <figcaption class="bm-legend"><span><i class="k-p"></i>${esc(t('exercise.primary'))}</span><span><i class="k-s"></i>${esc(t('exercise.secondary'))}</span></figcaption></figure></details>`;
 }
 
 export function exerciseList(day, lang, { actions = false } = {}) {
@@ -212,6 +223,7 @@ export default {
             <span class="chip">${esc(t('results.perWeek', { d: plan.daysPerWeek }))}</span>
             <span class="chip">${esc(t('results.weeks', { w }))}</span>
           </div>
+          <div class="plan-head-actions"><button type="button" class="btn btn-sm" data-pdf>${icon('download')}${esc(t('pdf.button'))}</button></div>
         </header>
 
         <div class="card">
@@ -234,6 +246,7 @@ export default {
             <span class="chip num">${esc(t('results.exercises', { n: day.exercises.length }))}</span>
           </div>
           <div class="diff-row">${diffBadge(difficultyOf(day.exercises), { label: true })}${day.edited ? `<span class="chip">${esc(t('edit.edited'))}</span>` : ''}</div>
+          ${dayMap(day)}
           ${exerciseList(day, lang, { actions: true })}
           <a class="btn btn-block" href="#editar-${esc(day.key)}" style="margin-top:12px">${icon('plan')}${esc(t('edit.button'))}</a>
           <button type="button" class="btn btn-primary btn-block" data-start style="margin-top:14px">${icon('dumbbell')}${esc(t('plan.startDay', { k: day.key }))}</button>
@@ -297,6 +310,27 @@ export default {
       });
     }));
     el.querySelector('[data-custom]').addEventListener('click', () => startBuilder());
+    el.querySelector('[data-pdf]').addEventListener('click', () => {
+      let scope = 'all';
+      openSheet({
+        title: t('pdf.sheetTitle'),
+        content: `<div class="more-menu pdf-scope">
+            <button type="button" class="nav-item" data-sc="all" aria-pressed="true">${icon('plan')}<span>${esc(t('pdf.whole'))}</span></button>
+            <button type="button" class="nav-item" data-sc="${day.key}" aria-pressed="false"><span class="day-badge day-${day.key}">${day.key}</span><span>${esc(t('pdf.onlyDay', { k: day.key }))}</span></button>
+          </div>
+          <label class="toggle-row" style="margin-top:10px"><span>${esc(t('pdf.grid'))}</span><input type="checkbox" data-g ${gridOn() ? 'checked' : ''}></label>
+          <p class="setting-hint">${esc(t('pdf.gridHint'))}</p>
+          <div class="sheet-actions"><button type="button" class="btn btn-ghost" data-dismiss>${esc(t('sheet.cancel'))}</button>
+          <button type="button" class="btn btn-primary" data-ok>${icon('download')}${esc(t('pdf.open'))}</button></div>`,
+        onMount(sheet, close) {
+          sheet.querySelectorAll('[data-sc]').forEach((b) => b.addEventListener('click', () => {
+            scope = b.dataset.sc;
+            sheet.querySelectorAll('[data-sc]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          }));
+          sheet.querySelector('[data-ok]').addEventListener('click', () => { setGrid(sheet.querySelector('[data-g]').checked); close(); location.hash = '#pdf-' + scope; });
+        }
+      });
+    });
     el.querySelector('[data-m-week]').addEventListener('click', () => openWeekSheet(getActivePlan(), rerender));
     el.querySelector('[data-m-add]').addEventListener('click', () => openNewDaySheet(row, rerender, (k) => openWeekSheet(getActivePlan(), rerender, k)));
     el.querySelector('[data-m-dup]').addEventListener('click', async () => {

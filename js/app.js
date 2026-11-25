@@ -24,6 +24,7 @@ import { resetWorkouts } from './data/workouts.js';
 import partyScreen, { inviteScreen } from './screens/party.js';
 import planEditScreen from './screens/plan-edit.js';
 import builderScreen from './screens/builder.js';
+import printPlanScreen from './screens/print-plan.js';
 import { resetParty } from './data/party.js';
 import { coachAuto } from './ui/coach.js';
 
@@ -33,6 +34,7 @@ const ROUTES = [
   { id: 'plan', hash: 'plano', ic: 'plan', screen: planScreen, tab: true },
   { id: 'plan', hash: 'editar-', prefix: true, ic: 'plan', screen: planEditScreen, hidden: true },
   { id: 'builder', hash: 'criar-plano', ic: 'plan', screen: builderScreen, hidden: true },
+  { id: 'pdf', hash: 'pdf-', prefix: true, ic: 'download', screen: printPlanScreen, hidden: true },
   { id: 'calendar', hash: 'calendario', ic: 'calendar', screen: calendarScreen, tab: true },
   { id: 'dashboard', hash: 'progresso', ic: 'chart', screen: dashboardScreen, tab: true },
   { id: 'body', hash: 'corpo', ic: 'scale', screen: bodyScreen, group: 'progress' },

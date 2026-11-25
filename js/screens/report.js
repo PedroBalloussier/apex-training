@@ -214,6 +214,10 @@ export default {
           <span class="eyebrow">${esc(t('report.eyebrow'))}${isActive && !r.info.ended ? ' · ' + esc(t('report.partial')) : ''}</span>
           <h1>${esc(planTitle(r.plan))}</h1>
           <p class="muted">${esc(fmtDate(r.from, lang))} – ${esc(fmtDate(r.to, lang))} · ${esc(t('plan.week', { n: r.info.week, w: r.info.weeks }))}</p>
+          <div class="report-actions top no-print">
+            <button type="button" class="btn btn-sm" data-share>${icon('upload')}${esc(t('report.shareImage'))}</button>
+            <button type="button" class="btn btn-sm" data-print>${icon('download')}${esc(t('report.pdf'))}</button>
+          </div>
         </header>
 
         <div class="card hl-card">
@@ -254,10 +258,6 @@ export default {
         ${bodyHtml || `<div class="card"><div class="card-head"><span class="eyebrow">${esc(t('report.body'))}</span></div>
           <p class="muted">${esc(t('report.noBody'))}</p><a class="btn btn-sm" href="#corpo" style="margin-top:10px">${icon('plus')}${esc(t('body.add'))}</a></div>`}
 
-        <div class="report-actions no-print">
-          <button type="button" class="btn" data-share>${icon('upload')}${esc(t('report.shareImage'))}</button>
-          <button type="button" class="btn" data-print>${icon('download')}${esc(t('report.pdf'))}</button>
-        </div>
 
         ${isActive ? `
         <div class="card next-card no-print">
