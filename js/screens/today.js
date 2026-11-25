@@ -8,7 +8,7 @@ import { dayForDate, nextTraining } from '../engine/generator.js';
 import { cycleWeek, weekStrip, exerciseList } from './plan.js';
 import { loadWorkouts, getOpen, doneToday, workoutsThisWeek, streak } from '../data/workouts.js';
 import { startDay } from './start.js';
-import { dayLabel } from '../data/labels.js';
+import { dayLabel, dayTitle } from '../data/labels.js';
 import { phraseOfDay } from '../data/phrases.js';
 import { legendQuoteOfDay } from '../data/quotes.js';
 import { hallState } from './hall.js';
@@ -85,14 +85,14 @@ export default {
               <div class="empty-icon">${icon('trophy')}</div>
               <h3>${esc(t('session.doneToday', { k: finished.day_key }))}</h3>
               <p>${esc(t('session.doneTodayText', { d: formatDuration(Math.max(60, finished.duration_sec - (finished.duration_sec % 60)), lang) }))}</p>
-              ${next ? `<p class="setting-hint">${esc(t('todayPlan.next'))}: ${esc(dayLabel(next.day.type))} · ${esc(tl('weekdaysLong')[next.date.getDay()])}</p>` : ''}
+              ${next ? `<p class="setting-hint">${esc(t('todayPlan.next'))}: ${esc(dayTitle(next.day))} · ${esc(tl('weekdaysLong')[next.date.getDay()])}</p>` : ''}
             </div>
           </div>`;
       } else if (today) {
         workoutCard = collapsible({
           key: 'today-workout', cls: 'today-workout',
           head: `<span class="day-badge day-${today.key}">${today.key}</span>
-            <div style="min-width:0"><span class="eyebrow">${esc(t('todayPlan.todayIs', { k: today.key }))} · ${esc(t('results.exercises', { n: today.exercises.length }))}</span><h2>${esc(dayLabel(today.type))}</h2></div>`,
+            <div style="min-width:0"><span class="eyebrow">${esc(t('todayPlan.todayIs', { k: today.key }))} · ${esc(t('results.exercises', { n: today.exercises.length }))}</span><h2>${esc(dayTitle(today))}</h2></div>`,
           extra: `${diffBadge(difficultyOf(today.exercises), { compact: true })}<button type="button" class="btn btn-primary btn-sm today-go" data-start aria-label="${esc(t('todayPlan.start'))}">${icon('dumbbell')}<span>${esc(t('todayPlan.go'))}</span></button>`,
           body: `${exerciseList(today, lang)}
             <button type="button" class="btn btn-primary btn-block" data-start style="margin-top:14px">${icon('dumbbell')}${esc(t('todayPlan.start'))}</button>`

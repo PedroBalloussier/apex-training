@@ -1,5 +1,6 @@
 // Motor do Hall da Fama: escolhe o desafio da semana (ou do mês) e onde ele encaixa no plano.
 import { CHALLENGES } from '../data/challenges.js';
+import { dayOnWeekday } from './generator.js';
 
 const LEVEL = { beginner: 1, intermediate: 2, advanced: 3 };
 
@@ -44,7 +45,7 @@ export function placement(challenge, plan, from = new Date()) {
     if (i > 0 && d.getDay() === 1) break; // até domingo
     week.push(d);
   }
-  const dayAt = (d) => { const idx = plan.schedule.indexOf(d.getDay()); return idx === -1 ? null : plan.days[idx % plan.days.length]; };
+  const dayAt = (d) => dayOnWeekday(plan, d.getDay());
   const overlap = (day) => day ? day.focus.filter((m) => challenge.focus.includes(m)).length : 0;
 
   if (challenge.kind === 'replace') {

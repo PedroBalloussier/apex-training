@@ -1,4 +1,5 @@
 // Relatório do ciclo: destaques, consistência, força, corpo, exportar e nova triagem.
+import { planTitle } from '../data/labels.js';
 import { t, getLanguage } from '../i18n/index.js';
 import { icon } from '../ui/icons.js';
 import { esc } from '../utils/dom.js';
@@ -69,7 +70,7 @@ async function shareImage(r, lang, unit, hl) {
   g.fillStyle = '#F8FAFC'; g.font = font(700, 40); g.fillText('Apex', 172, 130);
   // Título
   g.fillStyle = '#7A8798'; g.font = font(600, 28); g.fillText(t('report.eyebrow').toUpperCase(), 80, 250);
-  g.fillStyle = '#F8FAFC'; g.font = font(700, 68); g.fillText(t('splits.' + r.plan.split), 80, 330);
+  g.fillStyle = '#F8FAFC'; g.font = font(700, 68); g.fillText(planTitle(r.plan), 80, 330);
   g.fillStyle = '#9DACBF'; g.font = font(500, 32); g.fillText(`${fmtDate(r.from, lang)} – ${fmtDate(r.to, lang)}`, 80, 385);
   // KPIs
   const k = [
@@ -211,7 +212,7 @@ export default {
       <section class="screen report">
         <header class="screen-head">
           <span class="eyebrow">${esc(t('report.eyebrow'))}${isActive && !r.info.ended ? ' · ' + esc(t('report.partial')) : ''}</span>
-          <h1>${esc(t('splits.' + r.plan.split))}</h1>
+          <h1>${esc(planTitle(r.plan))}</h1>
           <p class="muted">${esc(fmtDate(r.from, lang))} – ${esc(fmtDate(r.to, lang))} · ${esc(t('plan.week', { n: r.info.week, w: r.info.weeks }))}</p>
         </header>
 
@@ -269,7 +270,7 @@ export default {
         ${past.length ? `
         <div class="card no-print">
           <div class="card-head"><span class="eyebrow">${esc(t('report.pastCycles'))}</span></div>
-          <ul class="hist-list">${past.map((p) => `<li><a class="hist-date" href="#rel-${esc(p.id)}">${esc(t('splits.' + p.data.split))}</a>
+          <ul class="hist-list">${past.map((p) => `<li><a class="hist-date" href="#rel-${esc(p.id)}">${esc(planTitle(p.data))}</a>
             <span class="hist-sets">${esc(fmtDate(new Date(p.started_at), lang))} – ${esc(p.ended_at ? fmtDate(new Date(p.ended_at), lang) : '')}</span></li>`).join('')}</ul>
         </div>` : ''}
       </section>`;

@@ -4,8 +4,9 @@ import { esc } from '../utils/dom.js';
 import { loadCatalog, exerciseName } from '../data/catalog.js';
 import { generatePlans, HOME_EXTRAS } from '../engine/generator.js';
 import { saveTriage, activatePlan, lastTriage } from '../data/account.js';
-import { dayLabel } from '../data/labels.js';
+import { dayLabel, dayTitle } from '../data/labels.js';
 import { toast } from '../ui/feedback.js';
+import { startBuilder } from './builder.js';
 
 const DEFAULTS = {
   goal: null, level: null, weekdays: [], duration: 60, location: null, homeEquipment: [],
@@ -187,7 +188,7 @@ function renderResults(el) {
                 <div class="day-item">
                   <span class="day-badge day-${d.key}">${d.key}</span>
                   <div class="day-text">
-                    <span class="day-title">${esc(dayLabel(d.type))}</span>
+                    <span class="day-title">${esc(dayTitle(d))}</span>
                     <span class="day-ex">${esc(d.exercises.slice(0, 3).map((x) => exerciseName(x.id, lang)).join(' · '))}${d.exercises.length > 3 ? ' · +' + (d.exercises.length - 3) : ''}</span>
                   </div>
                 </div>`).join('')}
@@ -196,12 +197,26 @@ function renderResults(el) {
             <button type="button" class="btn ${p.recommended ? 'btn-primary' : ''} btn-block" data-choose="${i}" style="margin-top:auto">${esc(t('results.choose'))}</button>
           </article>`).join('')}
       </div>
+      <article class="card custom-card">
+        <div class="custom-card-text">
+          <h2>${icon('plan')}${esc(t('results.customTitle'))}</h2>
+          <p class="muted">${esc(t('results.customText'))}</p>
+        </div>
+        <button type="button" class="btn" data-custom>${icon('plus')}${esc(t('results.customBtn'))}</button>
+      </article>
       <div style="display:flex;justify-content:center">
         <button type="button" class="btn btn-ghost" data-redo>${esc(t('results.redo'))}</button>
       </div>
     </section>`;
 
   el.querySelector('[data-redo]').addEventListener('click', () => { state.view = 'steps'; state.step = 0; renderStep(el); });
+  el.querySelector('[data-custom]').addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true;
+    try { if (!state.triageId) state.triageId = await saveTriage(state.answers); } catch (err) { /* segue sem salvar a triagem */ }
+    const answers = structuredClone(state.answers);
+    state = null;
+    startBuilder(answers);
+  });
   el.querySelectorAll('[data-choose]').forEach((b) => b.addEventListener('click', async () => {
     const plan = { ...state.plans[Number(b.dataset.choose)], name: state.plans[Number(b.dataset.choose)].split };
     el.querySelectorAll('[data-choose]').forEach((x) => { x.disabled = true; });

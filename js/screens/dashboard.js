@@ -1,4 +1,5 @@
 // Progresso: ciclo, consistência, volume, evolução por exercício, recordes e corpo.
+import { planTitle } from '../data/labels.js';
 import { t, tl, getLanguage } from '../i18n/index.js';
 import { icon } from '../ui/icons.js';
 import { esc } from '../utils/dom.js';
@@ -20,7 +21,7 @@ export function cycleCard(row, lang, { compact = false } = {}) {
   return `
     <div class="card cycle-card ${near ? 'near' : ''}">
       <div class="card-head">
-        <div><span class="eyebrow">${esc(t('dash.cycle'))}</span><h2>${esc(t('splits.' + row.data.split))}</h2></div>
+        <div><span class="eyebrow">${esc(t('dash.cycle'))}</span><h2>${esc(planTitle(row.data))}</h2></div>
         <span class="chip num">${esc(t('plan.week', { n: info.week, w: info.weeks }))}</span>
       </div>
       <div class="progress big"><i style="width:${info.pct.toFixed(1)}%"></i></div>

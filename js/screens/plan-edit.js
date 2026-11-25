@@ -4,9 +4,10 @@ import { icon } from '../ui/icons.js';
 import { esc } from '../utils/dom.js';
 import { toast, openSheet } from '../ui/feedback.js';
 import { getActivePlan, updateActivePlanData, lastTriage } from '../data/account.js';
+import { getBuilderPlan, setBuilderDay, builderAnswers } from './builder.js';
 import { loadCatalog, getExercise, exerciseName, musclesLine } from '../data/catalog.js';
 import { EDIT_MUSCLES, fillDay, computeFocus, typeForMuscles, defaultPrescription, weekWarnings, equipmentFor } from '../engine/generator.js';
-import { dayLabel } from '../data/labels.js';
+import { dayLabel, dayTitle } from '../data/labels.js';
 import { TECHNIQUES, techName, groupSize, groupName } from '../data/techniques.js';
 import { diffBadge } from '../ui/difficulty.js';
 import { difficultyOf } from '../engine/difficulty.js';
@@ -32,9 +33,8 @@ export function warningText(w) {
   return t('edit.warn.' + w.key, p);
 }
 
-function openPicker(el, rerender) {
+function openPicker(el, rerender, plan) {
   const lang = getLanguage();
-  const plan = getActivePlan().data;
   const equip = st.answers && st.answers.location ? equipmentFor(st.answers) : null;
   const f = { q: '', m: st.muscles[0] || 'all', mine: !!equip };
   openSheet({
@@ -76,24 +76,29 @@ function openPicker(el, rerender) {
   });
 }
 
-async function render(el, key) {
+async function render(el, routeKey) {
   const lang = getLanguage();
-  const row = getActivePlan();
-  if (!row) { location.hash = '#plano'; return; }
+  // "novo-A" edita um dia do plano que está sendo montado no construtor (ainda não salvo)
+  const builder = routeKey.startsWith('novo-');
+  const key = builder ? routeKey.slice(5) : routeKey;
+  const back = builder ? '#criar-plano' : '#plano';
+  const bp = builder ? getBuilderPlan() : null;
+  const row = builder ? (bp && { id: 'builder', data: bp }) : getActivePlan();
+  if (!row) { location.hash = back; return; }
   const plan = row.data;
   const day = plan.days.find((d) => d.key === key);
-  if (!day) { location.hash = '#plano'; return; }
+  if (!day) { location.hash = back; return; }
   await loadCatalog();
-  if (!st || st.key !== key || st.planId !== row.id) {
-    const triage = await lastTriage().catch(() => null);
+  if (!st || st.key !== routeKey || st.planId !== row.id) {
+    const triage = builder ? null : await lastTriage().catch(() => null);
     st = {
-      key, planId: row.id, draft: structuredClone(day), dirty: false, focusApplied: null, preview: null,
+      key: routeKey, planId: row.id, draft: structuredClone(day), dirty: false, focusApplied: null, preview: null,
       muscles: (day.focusMuscles || computeFocus(day.exercises, getExercise)).filter((m) => EDIT_MUSCLES.includes(m)).slice(0, 3),
-      answers: triage && triage.answers
+      answers: builder ? builderAnswers() : (triage && triage.answers)
     };
   }
   const d = st.draft;
-  const rerender = () => render(el, key);
+  const rerender = () => render(el, routeKey);
   const planDraft = { ...plan, days: plan.days.map((x) => (x.key === key ? d : x)) };
   const warns = weekWarnings(planDraft, getExercise);
   const totalSets = d.exercises.reduce((n, x) => n + (Number(x.sets) || 0), 0);
@@ -101,9 +106,9 @@ async function render(el, key) {
 
   el.innerHTML = `
     <section class="screen plan-edit">
-      <a class="btn btn-sm btn-ghost back-link" href="#plano" data-leave>${icon('chevron')}${esc(t('nav.plan'))}</a>
+      <a class="btn btn-sm btn-ghost back-link" href="${back}" data-leave>${icon('chevron')}${esc(builder ? t('builder.title') : t('nav.plan'))}</a>
       <header class="screen-head">
-        <span class="eyebrow">${esc(dayLabel(day.type))}${day.edited ? ' · ' + esc(t('edit.edited')) : ''}</span>
+        <span class="eyebrow">${esc(dayTitle(day))}${day.edited && !builder ? ' · ' + esc(t('edit.edited')) : ''}</span>
         <h1>${esc(t('edit.title', { k: key }))}</h1>
       </header>
 
@@ -168,8 +173,8 @@ async function render(el, key) {
       <div class="edit-footer">
         <button type="button" class="btn btn-primary btn-block" data-save>${icon('check')}${esc(t('edit.save'))}</button>
         <div class="edit-footer-row">
-          <a class="btn btn-ghost" href="#plano" data-leave>${esc(t('sheet.cancel'))}</a>
-          ${day.original ? `<button type="button" class="btn btn-ghost" data-restore>${icon('sparkle')}${esc(t('edit.restore'))}</button>` : ''}
+          <a class="btn btn-ghost" href="${back}" data-leave>${esc(t('sheet.cancel'))}</a>
+          ${day.original && !builder ? `<button type="button" class="btn btn-ghost" data-restore>${icon('sparkle')}${esc(t('edit.restore'))}</button>` : ''}
         </div>
       </div>
     </section>`;
@@ -243,13 +248,20 @@ async function render(el, key) {
     const x = d.exercises[at(sel)];
     if (x.technique) { x.technique.on = sel.value; mark(); }
   }));
-  el.querySelector('[data-add]').addEventListener('click', () => openPicker(el, rerender));
+  el.querySelector('[data-add]').addEventListener('click', () => openPicker(el, rerender, plan));
 
   // Salvar, restaurar, sair
   el.querySelector('[data-save]').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     if (!d.exercises.length) { toast(t('edit.empty'), 'info'); return; }
     btn.disabled = true;
+    if (builder) {
+      const nd = { ...structuredClone(d), focus: computeFocus(d.exercises, getExercise) };
+      if (st.focusApplied) { nd.focusMuscles = st.focusApplied; nd.type = typeForMuscles(st.focusApplied); }
+      setBuilderDay(key, nd);
+      st = null; toast(t('edit.saved'), 'check'); location.hash = back;
+      return;
+    }
     const data = structuredClone(plan);
     const idx = data.days.findIndex((x) => x.key === key);
     const orig = day.original || (({ original, edited, focusMuscles, ...rest }) => rest)(structuredClone(day));
@@ -284,7 +296,7 @@ async function render(el, key) {
       content: `<p class="muted">${esc(t('edit.discardText'))}</p><div class="sheet-actions">
         <button type="button" class="btn btn-ghost" data-dismiss>${esc(t('sheet.cancel'))}</button>
         <button type="button" class="btn btn-danger" data-ok>${esc(t('edit.discard'))}</button></div>`,
-      onMount(sheet, close) { sheet.querySelector('[data-ok]').addEventListener('click', () => { st = null; close(); location.hash = '#plano'; }); }
+      onMount(sheet, close) { sheet.querySelector('[data-ok]').addEventListener('click', () => { st = null; close(); location.hash = back; }); }
     });
   }));
 }

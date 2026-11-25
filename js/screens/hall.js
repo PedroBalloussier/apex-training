@@ -9,7 +9,7 @@ import { CHALLENGES, CATEGORIES, getChallenge } from '../data/challenges.js';
 import { loadRuns, loadPrefs, getShift, bumpShift } from '../data/hall.js';
 import { eligible, currentChallenge, placement, weekKey, monthKey } from '../engine/hall.js';
 import { equipmentFor } from '../engine/generator.js';
-import { repsText } from '../data/labels.js';
+import { repsText, dayTitle } from '../data/labels.js';
 import { formatWeight, formatDuration } from '../utils/units.js';
 import { startChallenge } from './start.js';
 import { diffBadge } from '../ui/difficulty.js';
@@ -29,7 +29,7 @@ function placementText(pl, lang) {
   const isToday = new Date().toDateString() === pl.date.toDateString();
   const when = isToday ? t('hall.today') : day;
   return pl.mode === 'replace'
-    ? t('hall.replaces', { k: pl.day.key, day: dayLabel(pl.day.type), when })
+    ? t('hall.replaces', { k: pl.day.key, day: dayTitle(pl.day), when })
     : t('hall.extraDay', { when });
 }
 

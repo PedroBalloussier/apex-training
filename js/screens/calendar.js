@@ -8,10 +8,11 @@ import { getActivePlan } from '../data/account.js';
 import { loadCatalog, exerciseName } from '../data/catalog.js';
 import { workoutsBetween, workoutSets } from '../data/workouts.js';
 import { formatWeight, formatDuration, weightToUser } from '../utils/units.js';
+import { dayOnWeekday } from '../engine/generator.js';
 import { exerciseList } from './plan.js';
 import { startDay } from './start.js';
 import { setVolume, setText } from '../data/techniques.js';
-import { dayLabel } from '../data/labels.js';
+import { dayLabel, dayTitle } from '../data/labels.js';
 
 let viewYear = null, viewMonth = null;
 
@@ -20,8 +21,7 @@ const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); retur
 
 function scheduledDay(plan, date, planStart) {
   if (!plan || date < planStart) return null;
-  const idx = plan.schedule.indexOf(date.getDay());
-  return idx === -1 ? null : plan.days[idx % plan.days.length];
+  return dayOnWeekday(plan, date.getDay());
 }
 
 export default {
@@ -150,7 +150,7 @@ export default {
         openSheet({
           title,
           content: `
-            <div class="card-title" style="margin-bottom:6px"><span class="day-badge day-${esc(sched.key)}">${esc(sched.key)}</span><h3>${esc(dayLabel(sched.type))}</h3></div>
+            <div class="card-title" style="margin-bottom:6px"><span class="day-badge day-${esc(sched.key)}">${esc(sched.key)}</span><h3>${esc(dayTitle(sched))}</h3></div>
             ${past ? `<p class="muted" style="margin-bottom:8px">${esc(t('calendar.missedText'))}</p>` : ''}
             ${exerciseList(sched, lang)}
             <div class="sheet-actions">

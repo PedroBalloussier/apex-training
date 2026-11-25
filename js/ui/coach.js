@@ -247,7 +247,7 @@ export function coachTip(key, { delay = 600 } = {}) {
 }
 
 /** Chamado depois de cada tela: boas-vindas na primeira vez; tour depois do primeiro plano. */
-const SKIP_ROUTES = new Set(['session', 'profile', 'invite']);
+const SKIP_ROUTES = new Set(['session', 'profile', 'invite', 'builder']);
 let pending = null;
 export function coachAuto(routeId) {
   if (active || pending || SKIP_ROUTES.has(routeId)) return;

@@ -308,9 +308,22 @@ export function generatePlans(answers, catalog) {
 
 /** Qual dia do plano cai numa data (ou null se for descanso). */
 export function dayForDate(plan, date = new Date()) {
-  const wd = date.getDay();
-  const idx = plan.schedule.indexOf(wd);
-  return idx === -1 ? null : plan.days[idx % plan.days.length];
+  return dayOnWeekday(plan, date.getDay());
+}
+
+/** Dia do plano na posição idx do calendário (dayMap permite repetir um dia na semana). */
+export function dayAtSlot(plan, idx) {
+  if (idx < 0 || !plan.days.length) return null;
+  if (Array.isArray(plan.dayMap) && plan.dayMap[idx]) {
+    const d = plan.days.find((x) => x.key === plan.dayMap[idx]);
+    if (d) return d;
+  }
+  return plan.days[idx % plan.days.length];
+}
+
+/** Dia do plano num dia da semana (0 = domingo), ou null se for descanso. */
+export function dayOnWeekday(plan, wd) {
+  return dayAtSlot(plan, plan.schedule.indexOf(wd));
 }
 
 /** Próximo dia de treino a partir de amanhã. */
@@ -390,16 +403,16 @@ function editCtx(plan, answers, otherDays) {
  * Refaz um dia para os grupos escolhidos: mantém os exercícios que ainda servem e completa o resto.
  * Retorna { exercises, kept, added, removed } (listas de ids).
  */
-export function fillDay({ muscles, day, plan, answers, catalog }) {
+export function fillDay({ muscles, day, plan, answers, catalog, size: wanted }) {
   const byId = new Map(catalog.map((e) => [e.id, e]));
   const ctx = editCtx(plan, answers, plan.days.filter((d) => d.key !== day.key));
-  const size = Math.min(9, Math.max(4, day.exercises.filter((x) => (byId.get(x.id) || {}).muscle !== 'fullbody' || muscles.includes('fullbody')).length || 6));
+  const size = wanted ? Math.min(9, Math.max(1, wanted)) : Math.min(9, Math.max(4, day.exercises.filter((x) => (byId.get(x.id) || {}).muscle !== 'fullbody' || muscles.includes('fullbody')).length || 6));
 
   // 1) Quantos exercícios cabem para cada grupo (o primeiro escolhido e os grupos grandes ganham mais)
   const share = muscles.map((m, i) => (BIG.has(m) ? 2 : 1) + (i === 0 ? 1 : 0));
   const sum = share.reduce((x, y) => x + y, 0);
   const target = share.map((w) => Math.max(1, Math.round((size * w) / sum)));
-  while (target.reduce((x, y) => x + y, 0) > size) { const i = target.indexOf(Math.max(...target)); target[i]--; }
+  while (target.reduce((x, y) => x + y, 0) > size && Math.max(...target) > 1) { const i = target.lastIndexOf(Math.max(...target)); target[i]--; }
   while (target.reduce((x, y) => x + y, 0) < size) { target[0]++; }
 
   // 2) Mantém o que ainda serve, até a cota de cada grupo (compostos primeiro)
@@ -466,7 +479,7 @@ export function weekWarnings(plan, getEx) {
   for (const d of plan.days) { const n = setsOf(d); if (n > 30) out.push({ key: 'tooMany', p: { k: d.key, n } }); }
   // Dias de treino em ordem na semana (segunda a domingo)
   const order = [1, 2, 3, 4, 5, 6, 0];
-  const seq = order.map((wd) => { const i = plan.schedule.indexOf(wd); return i === -1 ? null : plan.days[i % plan.days.length]; });
+  const seq = order.map((wd) => dayOnWeekday(plan, wd));
   const muscleSets = (d) => {
     const m = new Map();
     for (const x of d.exercises) { const e = getEx(x.id); if (e && !['core', 'fullbody', 'forearms'].includes(e.muscle)) m.set(e.muscle, (m.get(e.muscle) || 0) + (Number(x.sets) || 0)); }
@@ -487,5 +500,39 @@ export function weekWarnings(plan, getEx) {
     const missing = ['chest', 'back', 'shoulders', 'quads', 'hamstrings'].filter((m) => !all.has(m) && !(m === 'hamstrings' && all.has('glutes')));
     if (missing.length) out.push({ key: 'missing', p: { m: missing } });
   }
+  if (Array.isArray(plan.dayMap)) {
+    for (const d of plan.days) if (!plan.dayMap.includes(d.key)) out.push({ key: 'unused', p: { k: d.key } });
+  }
+  // Hipertrofia: revisão do ACSM (2026) viu mais ganho com 10 ou mais séries por semana por grupo
+  if ((plan.goal || 'hypertrophy') === 'hypertrophy') {
+    const ws = weeklySets(plan, getEx);
+    const low = [...ws.entries()].filter(([mu, n]) => BIG.has(mu) && mu !== 'fullbody' && n < 10).map(([mu]) => mu);
+    if (low.length) out.push({ key: 'lowVolume', p: { m: low } });
+  }
   return out;
 }
+
+/** Séries por semana de cada grupo (conta dias repetidos na semana). */
+export function weeklySets(plan, getEx) {
+  const m = new Map();
+  for (let i = 0; i < plan.schedule.length; i++) {
+    const d = dayAtSlot(plan, i);
+    if (!d) continue;
+    for (const x of d.exercises) {
+      const e = getEx(x.id);
+      if (e) m.set(e.muscle, (m.get(e.muscle) || 0) + (Number(x.sets) || 0));
+    }
+  }
+  return m;
+}
+
+export const EXERCISES_FOR = (duration) => EXERCISES_BY_DURATION[duration] || 6;
+
+/** Modelos rápidos para o construtor de plano: lista de dias com seus grupos. */
+export const BUILDER_PRESETS = {
+  ppl: [['chest', 'shoulders', 'triceps'], ['back', 'biceps'], ['quads', 'hamstrings', 'glutes']],
+  upper_lower: [['chest', 'back', 'shoulders'], ['quads', 'hamstrings', 'glutes']],
+  bro: [['chest'], ['back'], ['quads', 'hamstrings'], ['shoulders'], ['biceps', 'triceps']],
+  full: [['chest', 'back', 'quads']],
+  pairs: [['chest', 'triceps'], ['back', 'biceps'], ['quads', 'hamstrings', 'shoulders']]
+};

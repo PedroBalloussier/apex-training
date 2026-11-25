@@ -878,3 +878,44 @@ body.coach-open { overflow: hidden; }
 @media (max-width: 380px) { .edit-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .edit-list, .edit-row, .edit-fields > label, .tech-pick > *, .set-stepper { min-width: 0; }
 .edit-fields .input-sm, .tech-pick select { width: 100%; }
+
+/* ---------- Construtor de plano e organização do plano ---------- */
+.chip-btn.chip-sm { height: 34px; padding: 0 12px; font-size: 13.5px; }
+.builder-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.bstep { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 8px 10px; border-radius: 12px; background: var(--surface-2); color: var(--text-3); font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bstep b { width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; background: var(--line-2); color: var(--text-2); }
+.bstep b svg { width: 13px; height: 13px; stroke-width: 2.6; }
+.bstep.on { color: var(--text); background: color-mix(in srgb, var(--primary) 14%, var(--surface-2)); }
+.bstep.on b, .bstep.done b { background: var(--primary); color: var(--on-primary); }
+.builder-basics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+@media (min-width: 720px) { .builder-basics { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.builder-basics .field, .builder-basics select { min-width: 0; width: 100%; }
+.bdays { display: grid; gap: 12px; margin-top: 12px; }
+.bday { border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: grid; gap: 10px; min-width: 0; background: var(--surface-2); }
+.bday-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.bday-head .input { flex: 1; min-width: 0; padding-right: 10px; }
+.bday-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.bday-actions .btn { flex: 1 1 140px; }
+.bweek { display: grid; gap: 8px; margin-top: 10px; }
+.bweek-row { display: grid; grid-template-columns: 110px minmax(0, 1fr); align-items: center; gap: 10px; min-height: 44px; }
+.bweek-row.off { opacity: .7; }
+.bweek-day { font-weight: 600; text-transform: capitalize; }
+.bweek-row select { width: 100%; min-width: 0; }
+.vol-bars { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.vol-bars li { display: grid; grid-template-columns: 110px minmax(0, 1fr) 34px; align-items: center; gap: 10px; font-size: 14px; }
+.vb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vb-bar { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.vb-bar i { display: block; height: 100%; border-radius: 6px; background: var(--primary); }
+.vb-bar i.low { background: var(--warning); }
+.vb-n { text-align: right; font-weight: 650; }
+.custom-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-style: dashed; }
+.custom-card-text { flex: 1 1 260px; min-width: 0; }
+.custom-card h2 { display: flex; align-items: center; gap: 8px; }
+.custom-card h2 svg { width: 20px; height: 20px; }
+.custom-card .btn { flex: 0 1 auto; }
+@media (max-width: 560px) { .custom-card .btn { width: 100%; } }
+.manage-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.manage-grid .btn { min-width: 0; white-space: normal; height: auto; min-height: 44px; padding-top: 8px; padding-bottom: 8px; }
+@media (max-width: 380px) { .manage-grid { grid-template-columns: 1fr; } }
+.plan-bottom { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.bday-head .input, .bweek-row select { text-align: left; text-align-last: left; }

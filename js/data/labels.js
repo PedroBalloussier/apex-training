@@ -22,3 +22,14 @@ export function dayLabel(type) {
 export function repsText(reps) {
   return reps === 'falha' ? t('session.toFailure') : reps;
 }
+
+/** Nome do plano: o nome dado no construtor ou o nome da divisão. */
+export function planTitle(plan) {
+  if (plan && plan.customName) return plan.customName;
+  return t('splits.' + ((plan && plan.split) || 'custom'));
+}
+
+/** Nome de um dia do plano: o nome dado pelo usuário ou o rótulo do tipo. */
+export function dayTitle(day) {
+  return (day && day.name) || dayLabel(day && day.type);
+}
